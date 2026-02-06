@@ -1,0 +1,17 @@
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/pages/CategoriesPage.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/pages/DashboardPage.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/pages/LoginPage.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/pages/PlantsPage.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/runners/APITestRunner.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/runners/UITestRunner.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/stepdefinitions/api/AuthAPISteps.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/stepdefinitions/api/CategoriesAdminAPISteps.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/stepdefinitions/api/CategoriesUserAPISteps.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/stepdefinitions/ui/AuthUISteps.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/stepdefinitions/ui/CategoriesAdminUISteps.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/stepdefinitions/ui/CategoriesUserUISteps.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/stepdefinitions/ui/RolePagesUISteps.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/utils/ApiClient.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/utils/TestUsers.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/utils/Urls.java
+/Users/pahanaps/Dev/QA/QA-training-app-group-42/src/test/java/utils/Waits.java

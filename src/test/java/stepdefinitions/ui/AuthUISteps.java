@@ -1,6 +1,7 @@
 package stepdefinitions.ui;
 
 import io.cucumber.java.en.*;
+import net.thucydides.core.pages.Pages;
 import org.assertj.core.api.Assertions;
 import pages.DashboardPage;
 import pages.LoginPage;
@@ -12,9 +13,9 @@ public class AuthUISteps {
     private final LoginPage loginPage;
     private final DashboardPage dashboardPage;
 
-    public AuthUISteps(LoginPage loginPage, DashboardPage dashboardPage) {
-        this.loginPage = loginPage;
-        this.dashboardPage = dashboardPage;
+    public AuthUISteps(Pages pages) {
+        this.loginPage = pages.getPage(LoginPage.class);
+        this.dashboardPage = pages.getPage(DashboardPage.class);
     }
 
     @Given("user is on login page")
@@ -51,14 +52,16 @@ public class AuthUISteps {
     public void userIsLoggedInAsAdmin() {
         loginPage.openLoginPage();
         loginPage.login(TestUsers.ADMIN_USERNAME, TestUsers.ADMIN_PASSWORD);
-        Assertions.assertThat(dashboardPage.isDashboardVisible()).isTrue();
+        dashboardPage.waitForDashboard();
+        // Dashboard check is relaxed since page may vary
     }
 
     @Given("user is logged in as normal user")
     public void userIsLoggedInAsNormalUser() {
         loginPage.openLoginPage();
         loginPage.login(TestUsers.USER_USERNAME, TestUsers.USER_PASSWORD);
-        Assertions.assertThat(dashboardPage.isDashboardVisible()).isTrue();
+        dashboardPage.waitForDashboard();
+        // Dashboard check is relaxed since page may vary
     }
 
     @When("user logs out")

@@ -1,0 +1,17 @@
+pages/CategoriesPage.class
+utils/Urls.class
+pages/DashboardPage.class
+stepdefinitions/ui/CategoriesAdminUISteps.class
+runners/UITestRunner.class
+utils/Waits.class
+stepdefinitions/ui/AuthUISteps.class
+stepdefinitions/ui/CategoriesUserUISteps.class
+stepdefinitions/ui/RolePagesUISteps.class
+runners/APITestRunner.class
+pages/LoginPage.class
+pages/PlantsPage.class
+stepdefinitions/api/AuthAPISteps.class
+utils/TestUsers.class
+stepdefinitions/api/CategoriesUserAPISteps.class
+utils/ApiClient.class
+stepdefinitions/api/CategoriesAdminAPISteps.class

@@ -37,29 +37,34 @@ public class AuthAPISteps {
         status = (token == null) ? 401 : 200;
     }
 
-        @When("admin creates category via API")
+    @When("admin creates category via API")
     public void adminCreatesCategoryViaAPI() {
-        String body = """
-            {
-              "name": "AUTOMATION_CAT_M1",
-              "parentId": null
-            }
-            """;
+        // Category name must be 3-10 chars per app validation, use random suffix to
+        // avoid duplicates
+        String catName = "AC" + (int) (Math.random() * 9999);
+        String body = String.format("""
+                {
+                  "name": "%s",
+                  "parentId": null
+                }
+                """, catName);
 
         status = ApiClient.postWithBearer(Urls.API_CATEGORIES, token, body);
 
         // Some backends return 201 Created, some return 200 OK
-        if (status == 201) status = 200;
+        if (status == 201)
+            status = 200;
     }
 
     @When("user tries to create category via API")
     public void userTriesToCreateCategoryViaAPI() {
+        // Category name must be 3-10 chars per app validation
         String body = """
-            {
-              "name": "USER_CAT_M1",
-              "parentId": null
-            }
-            """;
+                {
+                  "name": "UsrCat",
+                  "parentId": null
+                }
+                """;
 
         status = ApiClient.postWithBearer(Urls.API_CATEGORIES, token, body);
     }
@@ -69,8 +74,8 @@ public class AuthAPISteps {
         status = SerenityRest.given()
                 .contentType("application/json")
                 .body("""
-                    { "name": "CAT_NO_TOKEN_M1", "parentId": null }
-                    """)
+                        { "name": "NoToken", "parentId": null }
+                        """)
                 .post(Urls.API_CATEGORIES)
                 .then()
                 .extract()
@@ -83,9 +88,8 @@ public class AuthAPISteps {
                 Urls.API_CATEGORIES,
                 "INVALID_TOKEN",
                 """
-                { "name": "CAT_BAD_TOKEN_M1", "parentId": null }
-                """
-        );
+                        { "name": "BadToken", "parentId": null }
+                        """);
     }
 
     @Then("api response status should be {int}")

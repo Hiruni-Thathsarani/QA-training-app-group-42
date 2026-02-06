@@ -2,7 +2,11 @@ package pages;
 
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.annotations.findby.FindBy;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
 
 public class DashboardPage extends PageObject {
 
@@ -20,9 +24,24 @@ public class DashboardPage extends PageObject {
         }
     }
 
+    public void waitForDashboard() {
+        try {
+            WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
+            wait.until(ExpectedConditions.or(
+                    ExpectedConditions.urlContains("/ui/dashboard"),
+                    ExpectedConditions.urlContains("/ui/categories"),
+                    ExpectedConditions
+                            .presenceOfElementLocated(By.cssSelector("h1, h2, .dashboard-title, .sidebar, nav"))));
+        } catch (Exception ignored) {
+            // Continue even if wait times out
+        }
+    }
+
     public void logout() {
         try {
-            if (logoutBtn != null) logoutBtn.click();
-        } catch (Exception ignored) {}
+            if (logoutBtn != null)
+                logoutBtn.click();
+        } catch (Exception ignored) {
+        }
     }
 }

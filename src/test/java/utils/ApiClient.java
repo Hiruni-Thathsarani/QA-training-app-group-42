@@ -10,11 +10,11 @@ public class ApiClient {
         var response = SerenityRest.given()
                 .contentType(ContentType.JSON)
                 .body("""
-                      {
-                        "username": "%s",
-                        "password": "%s"
-                      }
-                      """.formatted(username, password))
+                        {
+                          "username": "%s",
+                          "password": "%s"
+                        }
+                        """.formatted(username, password))
                 .post(Urls.API_LOGIN)
                 .then()
                 .extract()
@@ -50,5 +50,54 @@ public class ApiClient {
                 .then()
                 .extract()
                 .statusCode();
+    }
+
+    public static io.restassured.response.Response getResponseWithBearer(String url, String token) {
+        return SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .get(url)
+                .then()
+                .extract()
+                .response();
+    }
+
+    public static int putWithBearer(String url, String token, String jsonBody) {
+        return SerenityRest.given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body(jsonBody)
+                .put(url)
+                .then()
+                .extract()
+                .statusCode();
+    }
+
+    public static int deleteWithBearer(String url, String token) {
+        return SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .delete(url)
+                .then()
+                .extract()
+                .statusCode();
+    }
+
+    public static io.restassured.response.Response deleteResponseWithBearer(String url, String token) {
+        return SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .delete(url)
+                .then()
+                .extract()
+                .response();
+    }
+
+    public static io.restassured.response.Response postResponseWithBearer(String url, String token, String jsonBody) {
+        return SerenityRest.given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body(jsonBody)
+                .post(url)
+                .then()
+                .extract()
+                .response();
     }
 }
