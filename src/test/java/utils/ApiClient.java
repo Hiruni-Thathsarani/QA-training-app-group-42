@@ -5,31 +5,43 @@ import net.serenitybdd.rest.SerenityRest;
 
 public class ApiClient {
 
-    public static String loginAndGetToken(String username, String password) {
-
-        var response = SerenityRest.given()
-                .contentType(ContentType.JSON)
-                .body("""
+    public static LoginResult login(String username, String password) {
+        try {
+            var response = SerenityRest.given()
+                    .contentType(ContentType.JSON)
+                    .body("""
                       {
                         "username": "%s",
                         "password": "%s"
                       }
                       """.formatted(username, password))
-                .post(Urls.API_LOGIN)
-                .then()
-                .extract()
-                .response();
+                    .post(Urls.API_LOGIN)
+                    .then()
+                    .extract()
+                    .response();
 
-        if (response.statusCode() != 200) {
-            return null;
+            int status = response.statusCode();
+            if (status != 200) {
+                return new LoginResult(null, status);
+            }
+
+            String token = response.jsonPath().getString("token");
+            if (token == null || token.isBlank()) token = response.jsonPath().getString("accessToken");
+            if (token == null || token.isBlank()) token = response.jsonPath().getString("access_token");
+            if (token == null || token.isBlank()) token = response.jsonPath().getString("jwt");
+            if (token == null || token.isBlank()) token = response.jsonPath().getString("data.token");
+            if (token == null || token.isBlank()) token = response.jsonPath().getString("data.accessToken");
+            if (token == null || token.isBlank()) token = response.jsonPath().getString("data.access_token");
+
+            return new LoginResult(token, status);
+        } catch (Exception e) {
+            return new LoginResult(null, 0);
         }
+    }
 
-        String token = response.jsonPath().getString("token");
-        if (token == null || token.isBlank()) {
-            token = response.jsonPath().getString("accessToken");
-        }
+    public static String loginAndGetToken(String username, String password) {
 
-        return token;
+        return login(username, password).token();
     }
 
     public static int postWithBearer(String url, String token, String jsonBody) {
