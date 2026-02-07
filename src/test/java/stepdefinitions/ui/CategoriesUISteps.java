@@ -8,8 +8,8 @@ import org.assertj.core.api.Assertions;
 import pages.CategoriesPage;
 import pages.DashboardPage;
 import pages.LoginPage;
-import utils.TestUsers;
 import utils.Urls;
+import utils.TestUsers;
 
 public class CategoriesUISteps {
 
@@ -73,7 +73,7 @@ public class CategoriesUISteps {
         // Always seed using admin credentials to ensure pagination exists.
         loginPage.openLoginPage();
         loginPage.login(TestUsers.ADMIN_USERNAME, TestUsers.ADMIN_PASSWORD);
-        categoriesPage.openUrl(Urls.UI_CATEGORIES);
+        categoriesPage.openUrl(utils.Urls.UI_CATEGORIES);
 
         seedCategoriesUntilNextPage(200);
 
@@ -128,12 +128,12 @@ public class CategoriesUISteps {
             // Try to seed more categories as admin and re-check.
             loginPage.openLoginPage();
             loginPage.login(TestUsers.ADMIN_USERNAME, TestUsers.ADMIN_PASSWORD);
-            categoriesPage.openUrl(Urls.UI_CATEGORIES);
+            categoriesPage.openUrl(utils.Urls.UI_CATEGORIES);
             seedCategoriesUntilNextPage(120);
 
             loginPage.openLoginPage();
             loginPage.login(TestUsers.USER_USERNAME, TestUsers.USER_PASSWORD);
-            categoriesPage.openUrl(Urls.UI_CATEGORIES);
+            categoriesPage.openUrl(utils.Urls.UI_CATEGORIES);
             nextPageAvailable = categoriesPage.nextPageEnabled();
         }
         if (nextPageAvailable) {
@@ -169,7 +169,7 @@ public class CategoriesUISteps {
             categoriesPage.setCategoryName(name);
             categoriesPage.selectNoParentIfPossible();
             categoriesPage.saveCategory();
-            categoriesPage.openUrl(Urls.UI_CATEGORIES);
+            categoriesPage.openUrl(utils.Urls.UI_CATEGORIES);
             attempts++;
         }
     }

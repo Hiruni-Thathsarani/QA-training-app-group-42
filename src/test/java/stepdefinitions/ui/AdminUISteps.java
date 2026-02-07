@@ -170,25 +170,4 @@ public class AdminUISteps {
     public void sellPlantActionShouldBeVisible() {
         Assertions.assertThat(salesPage.sellActionVisible()).isTrue();
     }
-
-    // add inside AdminUISteps class
-
-    @When("admin opens add category page")
-    public void adminOpensAddCategoryPage() {
-        categoriesPage.openUrl(Urls.UI_CATEGORIES_ADD);
-    }
-
-    @Then("add category page should be visible")
-    public void addCategoryPageShouldBeVisible() {
-        // page should not be 403 / forbidden
-        String url = categoriesPage.getDriver().getCurrentUrl();
-        String source = categoriesPage.getDriver().getPageSource();
-        boolean blocked = url.contains("403") || source.contains("Forbidden");
-        Assertions.assertThat(blocked).as("Admin should access add category page").isFalse();
-
-        // form elements should exist (best-effort)
-        boolean hasNameInput = source.contains("name") || source.contains("Name");
-        Assertions.assertThat(hasNameInput).isTrue();
-    }
-
 }
