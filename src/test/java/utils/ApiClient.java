@@ -55,6 +55,37 @@ public class ApiClient {
                 .statusCode();
     }
 
+    public static String createCategory(String token, String name, String parentId) {
+        String body;
+        if (parentId == null) {
+            body = """
+                { "name": "%s" }
+                """.formatted(name);
+        } else {
+            body = """
+                { "name": "%s", "parentId": "%s" }
+                """.formatted(name, parentId);
+        }
+
+        var response = SerenityRest.given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body(body)
+                .post(Urls.API_CATEGORIES)
+                .then()
+                .extract()
+                .response();
+
+        if (response.statusCode() != 200 && response.statusCode() != 201) {
+            return null;
+        }
+
+        String id = response.jsonPath().getString("id");
+        if (id == null || id.isBlank()) id = response.jsonPath().getString("data.id");
+        if (id == null || id.isBlank()) id = response.jsonPath().getString("categoryId");
+        return id;
+    }
+
     public static int getWithBearer(String url, String token) {
         return SerenityRest.given()
                 .header("Authorization", "Bearer " + token)

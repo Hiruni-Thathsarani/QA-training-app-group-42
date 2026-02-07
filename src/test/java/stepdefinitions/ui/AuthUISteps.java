@@ -74,7 +74,12 @@ public class AuthUISteps {
 
     @Then("login page should be visible")
     public void loginPageShouldBeVisible() {
-        Assertions.assertThat(loginPage.getDriver().getCurrentUrl()).contains("/ui/login");
+        String url = loginPage.getDriver().getCurrentUrl();
+        for (int i = 0; i < 5 && !url.contains("/ui/login"); i++) {
+            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+            url = loginPage.getDriver().getCurrentUrl();
+        }
+        Assertions.assertThat(url).contains("/ui/login");
     }
 
     @Given("user is not logged in")

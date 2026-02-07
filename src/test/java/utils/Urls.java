@@ -8,6 +8,7 @@ public class Urls {
     // ================= UI =================
     public static final String UI_LOGIN = BASE_URL + "/ui/login";
     public static final String UI_DASHBOARD = BASE_URL + "/ui/dashboard";
+    public static final String UI_LOGOUT = BASE_URL + "/ui/logout";
     public static final String UI_SELL_NEW = BASE_URL + "/ui/sales/new";
 
     // ================= AUTH (Swagger) =================
@@ -25,7 +26,9 @@ public class Urls {
     public static final String API_SALES = BASE_URL + "/api/sales";
 
     public static final String UI_CATEGORIES = BASE_URL + "/ui/categories";
+    public static final String UI_CATEGORIES_ADD = BASE_URL + "/ui/categories/add";
     public static final String UI_PLANTS = BASE_URL + "/ui/plants";
+    public static final String UI_PLANTS_ADD = BASE_URL + "/ui/plants/add";
     public static final String UI_SALES = BASE_URL + "/ui/sales";
 
 

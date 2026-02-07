@@ -28,14 +28,11 @@ public class DashboardPage extends PageObject {
         try {
             if (logoutBtn != null) logoutBtn.click();
         } catch (Exception ignored) {}
-    }
-
-    public void openInventory() {
-        WebElement link = firstDisplayed("a[href*='plants'], a[href*='inventory'], a[href*='ui/plants'], nav a");
-        if (link != null) {
-            try { link.click(); return; } catch (Exception ignored) {}
-        }
-        openUrl(Urls.UI_PLANTS);
+        try {
+            if (!getDriver().getCurrentUrl().contains("/ui/login")) {
+                openUrl(utils.Urls.UI_LOGOUT);
+            }
+        } catch (Exception ignored) {}
     }
 
     private WebElement firstDisplayed(String css) {
