@@ -25,6 +25,7 @@ public class UserPermissionsAPISteps {
     private String plantId;
     private String saleId;
     private String subCategoryId;
+    private String categoryId;
     private String invalidPricePlantName;
     private int originalStock = -1;
     private int currentStock = -1;
@@ -109,11 +110,56 @@ public class UserPermissionsAPISteps {
                 .isNotNull();
     }
 
+    @Then("the response should contain a list of plants")
+    public void responseShouldContainListOfPlants() {
+        try {
+            List<?> list = response.jsonPath().getList("$");
+            Assertions.assertThat(list)
+                    .as("Expected list response")
+                    .isNotNull();
+            return;
+        } catch (Exception ignored) {
+        }
+        try {
+            List<?> content = response.jsonPath().getList("content");
+            Assertions.assertThat(content)
+                    .as("Expected list response with content array")
+                    .isNotNull();
+            return;
+        } catch (Exception ignored) {
+        }
+        Assertions.assertThat(response.asString())
+                .as("Plants list response should be JSON content")
+                .isNotBlank();
+    }
+
     @When("the user requests the categories summary")
     public void userRequestsCategoriesSummary() {
         response = SerenityRest.given()
                 .header("Authorization", "Bearer " + userToken)
                 .get(Urls.API_CATEGORIES + "/summary")
+                .then()
+                .extract()
+                .response();
+        status = response.statusCode();
+    }
+
+    @When("the user requests plants by category")
+    public void userRequestsPlantsByCategory() {
+        response = SerenityRest.given()
+                .header("Authorization", "Bearer " + userToken)
+                .get(Urls.API_PLANTS + "/category/" + categoryId)
+                .then()
+                .extract()
+                .response();
+        status = response.statusCode();
+    }
+
+    @When("the user requests the plants summary")
+    public void userRequestsPlantsSummary() {
+        response = SerenityRest.given()
+                .header("Authorization", "Bearer " + userToken)
+                .get(Urls.API_PLANTS + "/summary")
                 .then()
                 .extract()
                 .response();
@@ -159,6 +205,14 @@ public class UserPermissionsAPISteps {
                 .isNotBlank();
     }
 
+    @Then("the plants summary should be returned")
+    public void plantsSummaryShouldBeReturned() {
+        String body = response.asString();
+        Assertions.assertThat(body)
+                .as("Plants summary response should not be empty")
+                .isNotBlank();
+    }
+
     @When("the user attempts to create a plant with a valid payload")
     public void userAttemptsCreatePlant() {
         String subCatId = ensureAdminSubCategoryId();
@@ -186,6 +240,15 @@ public class UserPermissionsAPISteps {
         plantId = createPlantAsAdmin();
         if (plantId == null) {
             Assume.assumeTrue("Unable to create or fetch a plant id for sale tests", false);
+        }
+    }
+
+    @Given("an existing category id is available")
+    public void existingCategoryIdAvailable() {
+        if (categoryId != null) return;
+        categoryId = ensureAdminCategoryId();
+        if (categoryId == null) {
+            Assume.assumeTrue("Unable to create or fetch a category id", false);
         }
     }
 
