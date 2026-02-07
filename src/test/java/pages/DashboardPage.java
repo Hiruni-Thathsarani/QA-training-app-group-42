@@ -1,3 +1,4 @@
+// DashboardPage.java
 package pages;
 
 import net.serenitybdd.core.pages.PageObject;
@@ -6,6 +7,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import utils.Urls;
+
 import java.time.Duration;
 
 public class DashboardPage extends PageObject {
@@ -30,18 +33,20 @@ public class DashboardPage extends PageObject {
             wait.until(ExpectedConditions.or(
                     ExpectedConditions.urlContains("/ui/dashboard"),
                     ExpectedConditions.urlContains("/ui/categories"),
-                    ExpectedConditions
-                            .presenceOfElementLocated(By.cssSelector("h1, h2, .dashboard-title, .sidebar, nav"))));
+                    ExpectedConditions.presenceOfElementLocated(
+                            By.cssSelector("h1, h2, .dashboard-title, .sidebar, nav"))));
         } catch (Exception ignored) {
-            // Continue even if wait times out
         }
     }
 
     public void logout() {
         try {
-            if (logoutBtn != null)
-                logoutBtn.click();
-        } catch (Exception ignored) {
-        }
+            if (logoutBtn != null) logoutBtn.click();
+        } catch (Exception ignored) {}
+        try {
+            if (!getDriver().getCurrentUrl().contains("/ui/login")) {
+                openUrl(Urls.UI_LOGOUT);
+            }
+        } catch (Exception ignored) {}
     }
 }
