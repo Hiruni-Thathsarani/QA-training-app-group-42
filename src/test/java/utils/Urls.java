@@ -19,8 +19,6 @@ public class Urls {
 
 
 
-    public static final String UI_CATEGORIES_ADD_POST = BASE_URL + "/ui/categories/add";
-    public static final String UI_PLANTS_ADD_POST = BASE_URL + "/ui/plants/add";
 
     public static final String API_LOGIN = BASE_URL + "/api/auth/login";
 
