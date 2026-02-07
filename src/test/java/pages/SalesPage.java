@@ -51,6 +51,10 @@ public class SalesPage extends PageObject {
         return anyDisplayedXpath("//a[contains(.,'Sell Plant')] | //button[contains(.,'Sell Plant')] | //a[contains(.,'Sell')]");
     }
 
+    public boolean sellActionVisible() {
+        return sellPlantVisible();
+    }
+
     public boolean deleteActionVisible() {
         if (anyDisplayedCss(
                 "button.delete, .btn-delete, a[href*='delete'], [data-testid*='delete'], "
@@ -253,7 +257,6 @@ public class SalesPage extends PageObject {
         return null;
     }
 
-    // ===== NEW CODE - USER SALES LIST TESTS START =====
     public boolean createSaleActionVisible() {
         if (anyDisplayedCss("a[href*='sales/new'], button.add-sale, .btn-add, a[href*='sell'], [data-testid*='create-sale'], [data-testid*='sell']")) {
             return true;
@@ -308,9 +311,7 @@ public class SalesPage extends PageObject {
         }
         return false;
     }
-    // ===== NEW CODE - USER SALES LIST TESTS END =====
 
-    // ===== NEW CODE - USER SALES LIST TESTS START =====
     public boolean isSellPlantFormVisible() {
         return isAtSellPlantPage() && anyDisplayedCss("form, .sell-form, .sale-form, .card form");
     }
@@ -477,9 +478,7 @@ public class SalesPage extends PageObject {
         }
         return null;
     }
-    // ===== NEW CODE - USER SALES LIST TESTS END =====
 
-    // ===== NEW CODE - ADMIN SALES UI TESTS START =====
     public boolean selectPlantForSaleByName(String plantName) {
         if (plantName == null || plantName.isBlank()) return false;
 
@@ -653,5 +652,4 @@ public class SalesPage extends PageObject {
         if (text == null) return "";
         return text.toLowerCase(Locale.ENGLISH).replaceAll("\\s+", " ").trim();
     }
-    // ===== NEW CODE - ADMIN SALES UI TESTS END =====
 }
