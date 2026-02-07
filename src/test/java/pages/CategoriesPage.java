@@ -214,11 +214,17 @@ public class CategoriesPage extends PageObject {
     }
 
     public boolean isEmptyStateDisplayed() {
-        String pageSource = getDriver().getPageSource().toLowerCase();
-        return pageSource.contains("no category found") ||
-                pageSource.contains("no categories") ||
-                pageSource.contains("no results") ||
-                tableRows.isEmpty();
+        // Strict check: requires a properly styled empty state UI element
+        // Not just text or empty table - app should have a dedicated empty state
+        // component
+        try {
+            // Look for a specific empty state element with proper styling
+            WebElement emptyState = getDriver().findElement(
+                    By.cssSelector(".empty-state, .no-data, [data-testid='empty-state']"));
+            return emptyState.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // ============== VISIBILITY CHECKS ==============
