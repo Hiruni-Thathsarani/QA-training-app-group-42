@@ -1,3 +1,4 @@
+// Urls.java
 package utils;
 
 public class Urls {
@@ -17,12 +18,13 @@ public class Urls {
     public static final String UI_CATEGORIES_ADD_POST = BASE_URL + "/ui/categories/add";
     public static final String UI_PLANTS_ADD_POST = BASE_URL + "/ui/plants/add";
 
-
-
-
     public static final String API_LOGIN = BASE_URL + "/api/auth/login";
 
     public static final String API_CATEGORIES = BASE_URL + "/api/categories";
+    public static final String API_CATEGORIES_PAGE = BASE_URL + "/api/categories/page";
+    public static final String API_CATEGORIES_MAIN = BASE_URL + "/api/categories/main";
+    public static final String API_CATEGORIES_SUB = BASE_URL + "/api/categories/sub-categories";
+    public static final String API_CATEGORIES_SUMMARY = BASE_URL + "/api/categories/summary";
 
     public static final String API_PLANTS = BASE_URL + "/api/plants";
 

@@ -1,3 +1,4 @@
+// APITestRunner.java
 package runners;
 
 import io.cucumber.junit.CucumberOptions;
@@ -6,8 +7,10 @@ import org.junit.runner.RunWith;
 
 @RunWith(CucumberWithSerenity.class)
 @CucumberOptions(
-        features = "src/test/resources/features/api/required_api.feature",
+        features = "src/test/resources/features/api",
         glue = {"stepdefinitions.api"},
-        plugin = {"pretty"}
+        plugin = {"pretty"},
+        tags = ""
 )
-public class APITestRunner {}
+public class APITestRunner {
+}
