@@ -50,7 +50,6 @@ public class CategoriesUISteps {
             return;
         }
 
-        // If actions are visible, verify access is blocked (403) per SRS.
         categoriesPage.openUrl(Urls.UI_CATEGORIES_ADD);
         String url = dashboardPage.getDriver().getCurrentUrl();
         String source = dashboardPage.getDriver().getPageSource();
@@ -70,7 +69,6 @@ public class CategoriesUISteps {
 
     @Given("more than one page of categories exist")
     public void moreThanOnePageOfCategoriesExist() {
-        // Always seed using admin credentials to ensure pagination exists.
         loginPage.openLoginPage();
         loginPage.login(TestUsers.ADMIN_USERNAME, TestUsers.ADMIN_PASSWORD);
         categoriesPage.openUrl(utils.Urls.UI_CATEGORIES);
@@ -125,7 +123,6 @@ public class CategoriesUISteps {
         beforePageIndex = categoriesPage.getActivePageIndex();
         nextPageAvailable = categoriesPage.nextPageEnabled();
         if (!nextPageAvailable) {
-            // Try to seed more categories as admin and re-check.
             loginPage.openLoginPage();
             loginPage.login(TestUsers.ADMIN_USERNAME, TestUsers.ADMIN_PASSWORD);
             categoriesPage.openUrl(utils.Urls.UI_CATEGORIES);
@@ -154,7 +151,6 @@ public class CategoriesUISteps {
 
         Assertions.assertThat(categoriesPage.isListVisible()).isTrue();
         if (!(urlChanged || pageIndexAdvanced)) {
-            // Some UIs paginate via AJAX without URL or index changes.
             Assertions.assertThat(categoriesPage.isListVisible())
                     .as("Pagination should load items even if URL/index doesn't change")
                     .isTrue();

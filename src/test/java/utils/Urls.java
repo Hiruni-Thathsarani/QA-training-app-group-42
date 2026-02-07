@@ -30,6 +30,9 @@ public class Urls {
     public static final String UI_PLANTS = BASE_URL + "/ui/plants";
     public static final String UI_PLANTS_ADD = BASE_URL + "/ui/plants/add";
     public static final String UI_SALES = BASE_URL + "/ui/sales";
+    public static final String UI_CATEGORIES_ADD_POST = BASE_URL + "/ui/categories/add";
+    public static final String UI_PLANTS_ADD_POST = BASE_URL + "/ui/plants/add";
+
 
 
     private Urls() {}

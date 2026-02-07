@@ -127,7 +127,6 @@ public class AdminUISteps {
         plantsPage.setPlantQuantityIfPresent("1");
         boolean selected = plantsPage.selectCategoryByName(subName);
         if (!selected) {
-            // refresh once to allow dropdown to repopulate after category creation
             plantsPage.openUrl(Urls.UI_PLANTS_ADD);
             plantsPage.setPlantName(createdPlantName);
             plantsPage.setPlantPriceIfPresent("10");
@@ -140,14 +139,12 @@ public class AdminUISteps {
 
     @Then("plant should appear in list")
     public void plantShouldAppearInList() {
-        // Clear any previous filters from other scenarios
         plantsPage.resetToPlantsList();
         plantsPage.enterListSearchTerm(createdPlantName);
         plantsPage.applyFilterIfPresent();
 
         Assertions.assertThat(plantsPage.isAt()).isTrue();
 
-        // Wait a bit for the list to render + plant to appear
         boolean visible = plantsPage.waitUntilPlantVisible(createdPlantName);
         if (!visible) {
             String firstName = plantsPage.getFirstListedPlantName();
@@ -170,4 +167,21 @@ public class AdminUISteps {
     public void sellPlantActionShouldBeVisible() {
         Assertions.assertThat(salesPage.sellActionVisible()).isTrue();
     }
+
+    @When("admin opens add category page")
+    public void adminOpensAddCategoryPage() {
+        categoriesPage.openUrl(Urls.UI_CATEGORIES_ADD);
+    }
+
+    @Then("add category page should be visible")
+    public void addCategoryPageShouldBeVisible() {
+        String url = categoriesPage.getDriver().getCurrentUrl();
+        String source = categoriesPage.getDriver().getPageSource();
+        boolean blocked = url.contains("403") || source.contains("Forbidden");
+        Assertions.assertThat(blocked).as("Admin should access add category page").isFalse();
+
+        boolean hasNameInput = source.contains("name") || source.contains("Name");
+        Assertions.assertThat(hasNameInput).isTrue();
+    }
+
 }

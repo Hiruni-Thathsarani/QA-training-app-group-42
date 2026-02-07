@@ -57,9 +57,9 @@ public class AuthAPISteps {
         }
     }
 
-        @When("admin creates category via API")
+    @When("admin creates category via API")
     public void adminCreatesCategoryViaAPI() {
-        String uniqueName = "AUTOMATION_CAT_" + System.currentTimeMillis();
+        String uniqueName = shortCategoryName("C");
         String body = """
             {
               "name": "%s",
@@ -69,13 +69,12 @@ public class AuthAPISteps {
 
         status = ApiClient.postWithBearer(Urls.API_CATEGORIES, token, body);
 
-        // Some backends return 201 Created, some return 200 OK
         if (status == 201) status = 200;
     }
 
     @When("user tries to create category via API")
     public void userTriesToCreateCategoryViaAPI() {
-        String uniqueName = "USER_CAT_" + System.currentTimeMillis();
+        String uniqueName = shortCategoryName("U");
         String body = """
             {
               "name": "%s",
@@ -120,7 +119,6 @@ public class AuthAPISteps {
             return;
         }
 
-        // Empty payload or validation errors
         if (expected == 400) {
             Assertions.assertThat(status == 400 || status == 401).isTrue();
             return;
@@ -132,6 +130,14 @@ public class AuthAPISteps {
         }
 
         Assertions.assertThat(status).isEqualTo(expected);
+    }
+
+    private String shortCategoryName(String prefix) {
+        long suffix = Math.abs(System.currentTimeMillis() % 100000);
+        String name = prefix + suffix;
+        if (name.length() < 3) name = (name + "XXX").substring(0, 3);
+        if (name.length() > 10) name = name.substring(0, 10);
+        return name;
     }
 
 }
