@@ -4,6 +4,7 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SalesPage extends PageObject {
 
@@ -289,6 +292,175 @@ public class SalesPage extends PageObject {
             } catch (Exception ignored) {}
         }
         return false;
+    }
+    // ===== NEW CODE - USER SALES LIST TESTS END =====
+
+    // ===== NEW CODE - USER SALES LIST TESTS START =====
+    public boolean isSellPlantFormVisible() {
+        return isAtSellPlantPage() && anyDisplayedCss("form, .sell-form, .sale-form, .card form");
+    }
+
+    public boolean isAtSellPlantPage() {
+        try {
+            String url = getDriver().getCurrentUrl();
+            boolean urlMatches = url != null && (url.contains("/ui/sales/new") || url.contains("/sales/new"));
+            if (urlMatches) {
+                return true;
+            }
+
+            boolean sellPlantHeadingVisible = anyDisplayedXpath(
+                    "//*[self::h1 or self::h2 or self::h3]"
+                            + "[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'sell plant')]"
+            );
+            boolean sellFormVisible = anyDisplayedCss("form, .sell-form, .sale-form, .card form");
+            return sellPlantHeadingVisible && sellFormVisible;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean plantSelectionVisible() {
+        return firstDisplayedCss("select[name*='plant'], select#plant, [data-testid*='plant'] select") != null;
+    }
+
+    public boolean quantityFieldVisible() {
+        return firstDisplayedCss("input[name*='quantity'], input#quantity, input[type='number']") != null;
+    }
+
+    public boolean submitSellVisible() {
+        if (firstDisplayedCss("button[type='submit'], .btn-primary, .btn-submit") != null) {
+            return true;
+        }
+        return anyDisplayedXpath("//button[contains(.,'Submit')] | //button[contains(.,'Sell')] | //button[contains(.,'Save')]");
+    }
+
+    public boolean hasAccessOrAuthorizationError() {
+        String page = "";
+        try { page = getDriver().getPageSource(); } catch (Exception ignored) {}
+        String lower = page == null ? "" : page.toLowerCase(Locale.ENGLISH);
+        boolean authText = lower.contains("forbidden")
+                || lower.contains("unauthorized")
+                || lower.contains("access denied")
+                || lower.contains("403");
+        return authText || hasUiErrorBanner();
+    }
+
+    public boolean selectFirstPlantForSale() {
+        WebElement plantSelect = firstDisplayedCss("select[name*='plant'], select#plant, [data-testid*='plant'] select");
+        if (plantSelect == null) return false;
+        try {
+            Select select = new Select(plantSelect);
+            for (WebElement option : select.getOptions()) {
+                String value = option.getAttribute("value");
+                String text = option.getText();
+                if (value != null && !value.trim().isEmpty() && text != null && !text.trim().isEmpty()) {
+                    select.selectByValue(value);
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
+    }
+
+    public void clearQuantityForSale() {
+        WebElement quantity = firstDisplayedCss("input[name*='quantity'], input#quantity, input[type='number']");
+        if (quantity == null) return;
+        try {
+            quantity.clear();
+            quantity.sendKeys("");
+        } catch (Exception ignored) {}
+    }
+
+    public void enterOversellQuantity() {
+        WebElement quantity = firstDisplayedCss("input[name*='quantity'], input#quantity, input[type='number']");
+        if (quantity == null) return;
+        int oversell = resolveOversellQuantity();
+        try {
+            quantity.clear();
+            quantity.sendKeys(String.valueOf(oversell));
+        } catch (Exception ignored) {}
+    }
+
+    public void submitSellForm() {
+        WebElement submit = firstDisplayedCss("button[type='submit'], .btn-primary, .btn-submit");
+        if (submit != null) {
+            try {
+                submit.click();
+                return;
+            } catch (Exception ignored) {}
+        }
+        WebElement fallback = firstDisplayedXpath("//button[contains(.,'Submit')] | //button[contains(.,'Sell')] | //button[contains(.,'Save')]");
+        if (fallback != null) {
+            try { fallback.click(); } catch (Exception ignored) {}
+        }
+    }
+
+    public boolean quantityValidationErrorVisible() {
+        if (anyDisplayedCss("input[name*='quantity']:invalid, input#quantity:invalid")) {
+            return true;
+        }
+        return anyDisplayedXpath(
+                "//*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'quantity is required')]"
+                        + " | //*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'quantity required')]"
+                        + " | //*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'must not be blank')]"
+                        + " | //*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'required')]"
+        );
+    }
+
+    public boolean insufficientStockErrorVisible() {
+        return anyDisplayedXpath(
+                "//*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'insufficient stock')]"
+                        + " | //*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'not enough stock')]"
+                        + " | //*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'exceeds available stock')]"
+                        + " | //*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'available stock')]"
+        ) || hasUiErrorBanner();
+    }
+
+    public boolean saleCreationSuccessVisible() {
+        if (anyDisplayedCss(".alert-success, .toast-success, .snackbar.success")) {
+            return true;
+        }
+        return anyDisplayedXpath(
+                "//*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'sale created')]"
+                        + " | //*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'successfully sold')]"
+                        + " | //*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'created successfully')]"
+        );
+    }
+
+    private int resolveOversellQuantity() {
+        int detected = detectAvailableStockFromSelectedPlant();
+        if (detected > 0) return detected + 1;
+        return 999999;
+    }
+
+    private int detectAvailableStockFromSelectedPlant() {
+        WebElement plantSelect = firstDisplayedCss("select[name*='plant'], select#plant, [data-testid*='plant'] select");
+        if (plantSelect == null) return -1;
+        try {
+            Select select = new Select(plantSelect);
+            WebElement selected = select.getFirstSelectedOption();
+            if (selected == null) return -1;
+            String text = selected.getText();
+            if (text == null) return -1;
+            Matcher matcher = Pattern.compile("(\\d+)").matcher(text);
+            int last = -1;
+            while (matcher.find()) {
+                last = Integer.parseInt(matcher.group(1));
+            }
+            return last;
+        } catch (Exception ignored) {
+            return -1;
+        }
+    }
+
+    private WebElement firstDisplayedXpath(String xpath) {
+        List<WebElement> elements = getDriver().findElements(By.xpath(xpath));
+        for (WebElement element : elements) {
+            try {
+                if (element != null && element.isDisplayed()) return element;
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
     // ===== NEW CODE - USER SALES LIST TESTS END =====
 }
