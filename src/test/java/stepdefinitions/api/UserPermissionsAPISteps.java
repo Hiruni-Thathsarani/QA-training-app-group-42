@@ -161,27 +161,23 @@ public class UserPermissionsAPISteps {
 
     @When("the user attempts to create a plant with a valid payload")
     public void userAttemptsCreatePlant() {
-        String categoryId = ensureAdminCategoryId();
-        String body = categoryId == null
-                ? """
+        String subCatId = ensureAdminSubCategoryId();
+        if (subCatId == null) {
+            Assume.assumeTrue("No sub-category id available for create-plant test", false);
+        }
+        String body = """
                 { "name": "AUTO_PLANT_%s", "price": 10, "quantity": 1 }
-                """.formatted(System.currentTimeMillis())
-                : """
-                { "name": "AUTO_PLANT_%s", "price": 10, "quantity": 1, "categoryId": "%s" }
-                """.formatted(System.currentTimeMillis(), categoryId);
+                """.formatted(System.currentTimeMillis());
 
         response = SerenityRest.given()
                 .contentType("application/json")
                 .header("Authorization", "Bearer " + userToken)
                 .body(body)
-                .post(Urls.API_PLANTS)
+                .post(Urls.API_PLANTS + "/category/" + subCatId)
                 .then()
                 .extract()
                 .response();
         status = response.statusCode();
-        if (status == 400) {
-            Assume.assumeTrue("Plant payload rejected (400). Check required fields in API.", false);
-        }
     }
 
     @Given("an existing plant id is available")
@@ -196,10 +192,8 @@ public class UserPermissionsAPISteps {
     @When("the user attempts to sell the plant with quantity 1")
     public void userAttemptsSellPlant() {
         response = SerenityRest.given()
-                .contentType("application/json")
                 .header("Authorization", "Bearer " + userToken)
-                .body("{ \"quantity\": 1 }")
-                .post(Urls.API_SALES + "/plant/" + plantId)
+                .post(Urls.API_SALES + "/plant/" + plantId + "?quantity=1")
                 .then()
                 .extract()
                 .response();
@@ -215,10 +209,8 @@ public class UserPermissionsAPISteps {
         }
 
         Response saleResponse = SerenityRest.given()
-                .contentType("application/json")
                 .header("Authorization", "Bearer " + ensureAdminToken())
-                .body("{ \"quantity\": 1 }")
-                .post(Urls.API_SALES + "/plant/" + localPlantId)
+                .post(Urls.API_SALES + "/plant/" + localPlantId + "?quantity=1")
                 .then()
                 .extract()
                 .response();
@@ -276,7 +268,7 @@ public class UserPermissionsAPISteps {
 
     @When("the admin updates the plant details")
     public void adminUpdatesPlantDetails() {
-        updatedPlantName = "UPDATED_PLANT_" + System.currentTimeMillis();
+        updatedPlantName = shortPlantName("UPD_");
         String categoryId = ensureAdminSubCategoryId();
         if (categoryId == null) {
             categoryId = ensureAdminCategoryId();
@@ -369,25 +361,21 @@ public class UserPermissionsAPISteps {
     public void plantWithLowStockIsAvailable() {
         String categoryId = ensureAdminSubCategoryId();
         if (categoryId == null) {
-            categoryId = ensureAdminCategoryId();
-        }
-        if (categoryId == null) {
             Assume.assumeTrue("Unable to get category for low-stock plant", false);
         }
         String body = """
                 {
                   "name": "LOW_STOCK_%s",
                   "price": 10,
-                  "quantity": 1,
-                  "categoryId": %s
+                  "quantity": 1
                 }
-                """.formatted(System.currentTimeMillis(), categoryId);
+                """.formatted(System.currentTimeMillis());
 
         Response create = SerenityRest.given()
                 .contentType("application/json")
                 .header("Authorization", "Bearer " + ensureAdminToken())
                 .body(body)
-                .post(Urls.API_PLANTS)
+                .post(Urls.API_PLANTS + "/category/" + categoryId)
                 .then()
                 .extract()
                 .response();
@@ -408,10 +396,8 @@ public class UserPermissionsAPISteps {
     public void adminAttemptsToSellMoreThanStock() {
         int qty = Math.max(originalStock + 1, 2);
         response = SerenityRest.given()
-                .contentType("application/json")
                 .header("Authorization", "Bearer " + ensureAdminToken())
-                .body("{ \"quantity\": " + qty + " }")
-                .post(Urls.API_SALES + "/plant/" + plantId)
+                .post(Urls.API_SALES + "/plant/" + plantId + "?quantity=" + qty)
                 .then()
                 .extract()
                 .response();
@@ -463,7 +449,7 @@ public class UserPermissionsAPISteps {
 
         if (listResponse.statusCode() != 200) {
             // fall back to create category if listing isn't available
-            String name = "AUTO_CAT_" + System.currentTimeMillis();
+            String name = shortCategoryName("C");
             String id = ApiClient.createCategory(token, name, null);
             return id;
         }
@@ -476,8 +462,21 @@ public class UserPermissionsAPISteps {
             return subCategoryId;
         }
         String token = ensureAdminToken();
-        String parentName = "API_PARENT_" + System.currentTimeMillis();
-        String childName = "API_SUB_" + System.currentTimeMillis();
+        Response listResponse = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .get(Urls.API_CATEGORIES)
+                .then()
+                .extract()
+                .response();
+        if (listResponse.statusCode() == 200) {
+            String existing = extractSubCategoryIdFromList(listResponse);
+            if (existing != null) {
+                subCategoryId = existing;
+                return subCategoryId;
+            }
+        }
+        String parentName = shortCategoryName("P");
+        String childName = shortCategoryName("S");
 
         String parentId = ApiClient.createCategory(token, parentName, null);
         if (parentId == null) {
@@ -489,20 +488,20 @@ public class UserPermissionsAPISteps {
 
     private String createPlantAsAdmin() {
         String token = ensureAdminToken();
-        String categoryId = ensureAdminCategoryId();
+        String categoryId = ensureAdminSubCategoryId();
         if (categoryId == null) {
             return null;
         }
 
         String body = """
-                { "name": "AUTO_PLANT_%s", "price": 10, "quantity": 1, "categoryId": "%s" }
-                """.formatted(System.currentTimeMillis(), categoryId);
+                { "name": "AUTO_PLANT_%s", "price": 10, "quantity": 1 }
+                """.formatted(System.currentTimeMillis());
 
         Response createResponse = SerenityRest.given()
                 .contentType("application/json")
                 .header("Authorization", "Bearer " + token)
                 .body(body)
-                .post(Urls.API_PLANTS)
+                .post(Urls.API_PLANTS + "/category/" + categoryId)
                 .then()
                 .extract()
                 .response();
@@ -528,6 +527,24 @@ public class UserPermissionsAPISteps {
             if (content != null && !content.isEmpty()) {
                 Object id = content.get(0).get("id");
                 if (id != null) return id.toString();
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    private String extractSubCategoryIdFromList(Response listResponse) {
+        try {
+            List<Map<String, Object>> list = listResponse.jsonPath().getList("$");
+            if (list != null && !list.isEmpty()) {
+                for (Map<String, Object> item : list) {
+                    if (item == null) continue;
+                    Object parentName = item.get("parentName");
+                    if (parentName != null && !"-".equals(parentName.toString())) {
+                        Object id = item.get("id");
+                        if (id != null) return id.toString();
+                    }
+                }
             }
         } catch (Exception ignored) {
         }
@@ -565,5 +582,21 @@ public class UserPermissionsAPISteps {
         } catch (Exception e) {
             return -1;
         }
+    }
+
+    private String shortCategoryName(String prefix) {
+        long suffix = Math.abs(System.currentTimeMillis() % 100000);
+        String name = prefix + suffix;
+        if (name.length() < 3) name = (name + "XXX").substring(0, 3);
+        if (name.length() > 10) name = name.substring(0, 10);
+        return name;
+    }
+
+    private String shortPlantName(String prefix) {
+        long suffix = Math.abs(System.currentTimeMillis() % 1000000);
+        String name = prefix + suffix;
+        if (name.length() < 3) name = (name + "XXX").substring(0, 3);
+        if (name.length() > 25) name = name.substring(0, 25);
+        return name;
     }
 }
