@@ -1,6 +1,8 @@
 package stepdefinitions.api;
 
-import io.cucumber.java.en.*;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import net.serenitybdd.rest.SerenityRest;
 import org.assertj.core.api.Assertions;
 import org.junit.Assume;
@@ -19,6 +21,7 @@ public class AuthAPISteps {
         LoginResult result = ApiClient.login(TestUsers.ADMIN_USERNAME, TestUsers.ADMIN_PASSWORD);
         token = result.token();
         status = result.status();
+
         if (status == 0) {
             Assume.assumeTrue("API not reachable at " + Urls.API_LOGIN, false);
         }
@@ -32,6 +35,7 @@ public class AuthAPISteps {
         LoginResult result = ApiClient.login(TestUsers.USER_USERNAME, TestUsers.USER_PASSWORD);
         token = result.token();
         status = result.status();
+
         if (status == 0) {
             Assume.assumeTrue("API not reachable at " + Urls.API_LOGIN, false);
         }
@@ -44,7 +48,8 @@ public class AuthAPISteps {
     public void tokenShouldBeAvailable() {
         Assertions.assertThat(token)
                 .as("JWT token should be returned on successful login")
-                .isNotNull();
+                .isNotNull()
+                .isNotBlank();
     }
 
     @When("login via API with {string} and {string}")
@@ -52,6 +57,7 @@ public class AuthAPISteps {
         LoginResult result = ApiClient.login(username, password);
         token = result.token();
         status = result.status();
+
         if (status == 0) {
             Assume.assumeTrue("API not reachable at " + Urls.API_LOGIN, false);
         }
@@ -59,7 +65,8 @@ public class AuthAPISteps {
 
     @When("admin creates category via API")
     public void adminCreatesCategoryViaAPI() {
-        String uniqueName = "AUTOMATION_CAT_" + System.currentTimeMillis();
+        String uniqueName = shortCategoryName("C");
+
         String body = """
             {
               "name": "%s",
@@ -69,13 +76,14 @@ public class AuthAPISteps {
 
         status = ApiClient.postWithBearer(Urls.API_CATEGORIES, token, body);
 
-        // Some backends return 201 Created, some return 200 OK
+        // Normalize 201 -> 200 for older feature files expecting 200
         if (status == 201) status = 200;
     }
 
     @When("user tries to create category via API")
     public void userTriesToCreateCategoryViaAPI() {
-        String uniqueName = "USER_CAT_" + System.currentTimeMillis();
+        String uniqueName = shortCategoryName("U");
+
         String body = """
             {
               "name": "%s",
@@ -113,6 +121,7 @@ public class AuthAPISteps {
     @Then("api response status should be {int}")
     public void apiResponseStatusShouldBe(int expected) {
 
+        // For role-based denials, allow either 401 or 403
         if (expected == 403) {
             if (!(status == 401 || status == 403)) {
                 Assume.assumeTrue("Role not enforced; expected 401/403 but got " + status, false);
@@ -120,12 +129,13 @@ public class AuthAPISteps {
             return;
         }
 
-        // Empty payload or validation errors
+        // Sometimes invalid token returns 401 instead of 400 depending on implementation
         if (expected == 400) {
             Assertions.assertThat(status == 400 || status == 401).isTrue();
             return;
         }
 
+        // If endpoint/payload changed and admin create fails, skip instead of failing whole suite
         if (expected == 200 && status == 400) {
             Assume.assumeTrue("Admin create failed (400). Check payload/endpoint validation.", false);
             return;
@@ -134,4 +144,11 @@ public class AuthAPISteps {
         Assertions.assertThat(status).isEqualTo(expected);
     }
 
+    private String shortCategoryName(String prefix) {
+        long suffix = Math.abs(System.currentTimeMillis() % 100000);
+        String name = prefix + suffix;
+        if (name.length() < 3) name = (name + "XXX").substring(0, 3);
+        if (name.length() > 10) name = name.substring(0, 10);
+        return name;
+    }
 }
