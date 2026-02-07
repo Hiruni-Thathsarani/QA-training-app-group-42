@@ -25,3 +25,22 @@ Feature: Admin Sell Plant UI Tests
     And sale should not be created from sell plant form
     And no redirect to sales list should occur
   # ===== NEW CODE - USER SALES LIST TESTS END =====
+
+  # ===== NEW CODE - ADMIN SALES UI TESTS START =====
+  Scenario: Verify stock is reduced after successful sale (Admin UI)
+    Given user is logged in as admin
+    And admin has a sellable plant in plants list
+    When admin sells one unit of the selected plant
+    And admin navigates back to plants list
+    Then sale should be created successfully for the selected plant
+    And selected plant stock should be reduced by exactly one
+    And updated stock should be reflected for the selected plant in plants list
+
+  Scenario: Verify delete sale requires confirmation (Admin UI)
+    Given user is logged in as admin
+    And at least one sale exists for admin
+    When admin clicks delete on a sale record
+    Then delete confirmation dialog should be displayed for admin
+    And sale should not be deleted without admin confirmation
+    And deletion should require explicit admin confirmation
+  # ===== NEW CODE - ADMIN SALES UI TESTS END =====

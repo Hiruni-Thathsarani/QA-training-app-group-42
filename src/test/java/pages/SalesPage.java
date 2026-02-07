@@ -2,7 +2,9 @@ package pages;
 
 import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -50,7 +52,20 @@ public class SalesPage extends PageObject {
     }
 
     public boolean deleteActionVisible() {
-        if (anyDisplayedCss("button.delete, .btn-delete, a[href*='delete'], [data-testid*='delete']")) {
+        if (anyDisplayedCss(
+                "button.delete, .btn-delete, a[href*='delete'], [data-testid*='delete'], "
+                        + "tbody tr button.btn-danger, tbody tr button.btn-outline-danger, tbody tr a.btn-danger, tbody tr a.btn-outline-danger, "
+                        + "tbody tr button[class*='trash'], tbody tr a[class*='trash'], "
+                        + "tbody tr button[aria-label*='delete'], tbody tr a[aria-label*='delete'], tbody tr button[title*='delete'], tbody tr a[title*='delete']"
+        )) {
+            return true;
+        }
+        if (anyDisplayedXpath(
+                "//tbody//button[contains(@class,'danger') or contains(@class,'trash') or contains(@aria-label,'delete') or contains(@title,'delete')]"
+                        + " | //tbody//a[contains(@class,'danger') or contains(@class,'trash') or contains(@aria-label,'delete') or contains(@title,'delete')]"
+                        + " | //tbody//button[.//*[contains(@class,'trash') or contains(@class,'bi-trash') or contains(@class,'fa-trash')]]"
+                        + " | //tbody//a[.//*[contains(@class,'trash') or contains(@class,'bi-trash') or contains(@class,'fa-trash')]]"
+        )) {
             return true;
         }
         return anyDisplayedXpath("//button[contains(.,'Delete')] | //a[contains(.,'Delete')]");
@@ -463,4 +478,180 @@ public class SalesPage extends PageObject {
         return null;
     }
     // ===== NEW CODE - USER SALES LIST TESTS END =====
+
+    // ===== NEW CODE - ADMIN SALES UI TESTS START =====
+    public boolean selectPlantForSaleByName(String plantName) {
+        if (plantName == null || plantName.isBlank()) return false;
+
+        WebElement plantSelect = firstDisplayedCss("select[name*='plant'], select#plant, [data-testid*='plant'] select");
+        if (plantSelect == null) return false;
+
+        try {
+            Select select = new Select(plantSelect);
+            String target = normalize(plantName);
+            for (WebElement option : select.getOptions()) {
+                String value = option.getAttribute("value");
+                String optionText = option.getText();
+                if (value == null || value.trim().isEmpty()) continue;
+                if (optionText == null || optionText.trim().isEmpty()) continue;
+
+                String normalizedOption = normalize(optionText);
+                if (normalizedOption.equals(target) || normalizedOption.contains(target) || target.contains(normalizedOption)) {
+                    select.selectByValue(value);
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {}
+
+        return false;
+    }
+
+    public void enterSaleQuantity(int quantity) {
+        WebElement quantityInput = firstDisplayedCss("input[name*='quantity'], input#quantity, input[type='number']");
+        if (quantityInput == null) return;
+        try {
+            quantityInput.clear();
+            quantityInput.sendKeys(String.valueOf(quantity));
+        } catch (Exception ignored) {}
+    }
+
+    public boolean saleCreatedSuccessfully() {
+        if (saleCreationSuccessVisible()) return true;
+        if (quantityValidationErrorVisible()) return false;
+        if (insufficientStockErrorVisible()) return false;
+        if (hasUiErrorBanner()) return false;
+        return isAt() && !isAtSellPlantPage();
+    }
+
+    public int getVisibleSalesRowCount() {
+        int count = 0;
+        List<WebElement> rows = getDriver().findElements(By.cssSelector("tbody tr, .sale-row, .list-item"));
+        for (WebElement row : rows) {
+            try {
+                if (row != null && row.isDisplayed()) count++;
+            } catch (Exception ignored) {}
+        }
+        return count;
+    }
+
+    public void clickFirstDeleteAction() {
+        WebElement delete = firstDisplayedCss(
+                "tbody tr button.delete, tbody tr .btn-delete, tbody tr a[href*='delete'], tbody tr [data-testid*='delete'], "
+                        + "tbody tr button.btn-danger, tbody tr button.btn-outline-danger, tbody tr a.btn-danger, tbody tr a.btn-outline-danger, "
+                        + "tbody tr button[class*='trash'], tbody tr a[class*='trash'], "
+                        + "tbody tr button[aria-label*='delete'], tbody tr a[aria-label*='delete'], tbody tr button[title*='delete'], tbody tr a[title*='delete'], "
+                        + ".sales-list button.delete, .sales-list .btn-delete, .sales-list a[href*='delete'], .sales-list [data-testid*='delete'], "
+                        + ".sales-list button.btn-danger, .sales-list button.btn-outline-danger, .sales-list a.btn-danger, .sales-list a.btn-outline-danger, "
+                        + "button.delete, .btn-delete, a[href*='delete'], [data-testid*='delete']"
+        );
+        if (delete != null) {
+            try {
+                delete.click();
+                return;
+            } catch (Exception ignored) {}
+        }
+
+        WebElement fallback = firstDisplayedXpath(
+                "//tbody//button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'delete')]"
+                        + " | //tbody//button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'remove')]"
+                        + " | //tbody//button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'trash')]"
+                        + " | //tbody//a[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'delete')]"
+                        + " | //tbody//button[contains(@class,'danger') or contains(@class,'trash') or contains(@aria-label,'delete') or contains(@title,'delete')]"
+                        + " | //tbody//a[contains(@class,'danger') or contains(@class,'trash') or contains(@aria-label,'delete') or contains(@title,'delete')]"
+                        + " | //tbody//button[.//*[contains(@class,'trash') or contains(@class,'bi-trash') or contains(@class,'fa-trash')]]"
+                        + " | //tbody//a[.//*[contains(@class,'trash') or contains(@class,'bi-trash') or contains(@class,'fa-trash')]]"
+                        + " | //button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'delete')]"
+                        + " | //a[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'delete')]"
+        );
+        if (fallback != null) {
+            try { fallback.click(); } catch (Exception ignored) {}
+        }
+    }
+
+    public boolean deleteConfirmationVisible() {
+        if (nativeConfirmationAlertPresent()) {
+            return true;
+        }
+
+        if (anyDisplayedCss(".modal.show, .modal[style*='display: block'], .swal2-popup, [role='dialog'], .dialog, .confirm-dialog")) {
+            return true;
+        }
+
+        try {
+            String source = getDriver().getPageSource();
+            String lower = source == null ? "" : source.toLowerCase(Locale.ENGLISH);
+            return (lower.contains("are you sure") && lower.contains("delete"))
+                    || lower.contains("confirm deletion")
+                    || lower.contains("delete confirmation");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void cancelDeleteConfirmation() {
+        try {
+            Alert alert = getDriver().switchTo().alert();
+            alert.dismiss();
+            return;
+        } catch (Exception ignored) {}
+
+        WebElement cancelButton = firstDisplayedCss(
+                ".swal2-cancel, .modal.show button.btn-secondary, .modal.show .btn-cancel, .modal.show [data-testid*='cancel'], [role='dialog'] .btn-secondary, [role='dialog'] [data-testid*='cancel']"
+        );
+        if (cancelButton != null) {
+            try {
+                cancelButton.click();
+                return;
+            } catch (Exception ignored) {}
+        }
+
+        WebElement fallbackCancel = firstDisplayedXpath(
+                "//button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'cancel')]"
+                        + " | //button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'no')]"
+                        + " | //button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'close')]"
+                        + " | //a[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'cancel')]"
+        );
+        if (fallbackCancel != null) {
+            try { fallbackCancel.click(); } catch (Exception ignored) {}
+        }
+    }
+
+    public boolean containsVisibleRowSnapshot(String rowSnapshot) {
+        if (rowSnapshot == null || rowSnapshot.isBlank()) return false;
+        String expected = normalizeRowText(rowSnapshot);
+
+        List<WebElement> rows = getDriver().findElements(By.cssSelector("tbody tr, .sale-row, .list-item"));
+        for (WebElement row : rows) {
+            try {
+                if (row == null || !row.isDisplayed()) continue;
+                String actual = normalizeRowText(row.getText());
+                if (!actual.isBlank() && actual.equals(expected)) {
+                    return true;
+                }
+            } catch (Exception ignored) {}
+        }
+        return false;
+    }
+
+    private boolean nativeConfirmationAlertPresent() {
+        try {
+            getDriver().switchTo().alert();
+            return true;
+        } catch (NoAlertPresentException e) {
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String normalizeRowText(String text) {
+        if (text == null) return "";
+        return text.replaceAll("\\s+", " ").trim();
+    }
+
+    private String normalize(String text) {
+        if (text == null) return "";
+        return text.toLowerCase(Locale.ENGLISH).replaceAll("\\s+", " ").trim();
+    }
+    // ===== NEW CODE - ADMIN SALES UI TESTS END =====
 }
