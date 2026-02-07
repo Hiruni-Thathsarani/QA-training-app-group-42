@@ -552,4 +552,37 @@ public class AdminSalesAPISteps {
         return null;
     }
     // ===== NEW CODE - ADMIN SALES API TESTS END =====
+
+    // ===== NEW CODE - ADMIN API TESTS START =====
+    @When("admin requests health endpoint without authentication via api")
+    public void adminRequestsHealthEndpointWithoutAuthenticationViaApi() {
+        response = SerenityRest.given()
+                .get(Urls.BASE_URL + "/api/health")
+                .then()
+                .extract()
+                .response();
+
+        status = response.statusCode();
+    }
+
+    @Then("admin health api response status should be 200")
+    public void adminHealthApiResponseStatusShouldBe200() {
+        Assertions.assertThat(status).isEqualTo(200);
+    }
+
+    @And("admin health api response should indicate application is healthy")
+    public void adminHealthApiResponseShouldIndicateApplicationIsHealthy() {
+        String body = response == null || response.asString() == null
+                ? ""
+                : response.asString().trim().toLowerCase();
+
+        boolean indicatesHealthy = !body.isBlank()
+                && (body.contains("up")
+                || body.contains("ok")
+                || body.contains("healthy")
+                || body.contains("status"));
+
+        Assertions.assertThat(indicatesHealthy).isTrue();
+    }
+    // ===== NEW CODE - ADMIN API TESTS END =====
 }

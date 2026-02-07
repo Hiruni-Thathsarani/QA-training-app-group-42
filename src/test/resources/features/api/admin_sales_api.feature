@@ -34,3 +34,10 @@ Feature: Admin Sales API Tests
     Then admin sales delete api response status should allow success
     And deleted sale should not be found via sales api
   # // ===== NEW CODE - ADMIN SALES API TESTS END =====
+
+  # // ===== NEW CODE - ADMIN API TESTS START =====
+  Scenario: TC-060 Verify health endpoint returns OK
+    When admin requests health endpoint without authentication via api
+    Then admin health api response status should be 200
+    And admin health api response should indicate application is healthy
+  # // ===== NEW CODE - ADMIN API TESTS END =====
