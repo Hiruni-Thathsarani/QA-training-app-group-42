@@ -32,9 +32,9 @@ Feature: Categories User UI Tests (TC-081 to TC-085)
 
   @TC-084
   Scenario: TC-084 User UI Admin actions restricted for user
-    # Note: Edit/Delete buttons are currently visible to users (app issue)
-    # Only Add Category button is correctly hidden
     Then Add Category button should not be visible for user
+    And Edit buttons should not be visible for user
+    And Delete buttons should not be visible for user
 
   @TC-085
   Scenario: TC-085 User UI Empty state when no category found

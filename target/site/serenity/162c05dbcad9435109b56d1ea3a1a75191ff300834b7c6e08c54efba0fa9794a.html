@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>TC-087 User API Main categories</title>
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="57x57" href="apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="bootstrap-icons/bootstrap-icons.css">
+<!-- JQuery -->
+<script type="text/javascript" src="scripts/jquery-1.11.1.min.js"></script><!-- Required Stylesheets -->
+<link href="bootstrap-treeview/dist/bootstrap-treeview.min.css" rel="stylesheet">
+
+<!-- Required Javascript -->
+<script src="bootstrap-treeview/dist/bootstrap-treeview.min.js"></script><!-- DataTables -->
+<link type="text/css" href="datatables/1.13.1/datatables.min.css" rel="stylesheet" />
+<script type="text/javascript" src="datatables/1.13.1/datatables.min.js"></script>
+<script type="text/javascript" src="datatables/1.13.1/time-elapsed-dhms.js"></script>
+
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<script src="bootstrap/js/bootstrap.min.js"></script>
+
+
+<script>
+    jQuery.fn.dataTable.ext.type.order['time-elapsed-dhms-pre'] = function(data) {
+
+        var matches = data.match(/^(\d+(?:\.\d+)?)\s*([a-z]+)/i);
+        var multipliers = {
+            ms: 1,
+            s: 1000,
+            m: 60000,
+            h: 3600000,
+            d: 86400000
+        };
+
+        if (matches) {
+            var multiplier = multipliers[matches[2].toLowerCase()];
+            return parseFloat(matches[1]) * multiplier;
+        } else {
+            return -1;
+        };
+    };
+</script>
+<link rel="stylesheet" href="css/core.css"/>
+<link rel="stylesheet" href="css/link.css"/>
+<link type="text/css" media="screen" href="css/screen.css" rel="Stylesheet"/>
+<!--CHART.JS-->
+<script src="chartjs/chart.js"></script>
+<script src="chartjs/chartjs-plugin-datalabels@2.0.0.min.js"></script>
+<script src="chartjs/patternomaly.min.js"></script>
+<script>
+    // Register the plugin to all charts:
+    Chart.register(ChartDataLabels);
+</script>
+<!-- JQuery-UI -->
+<link type="text/css" href="jqueryui/1.11.2-start/jquery-ui.min.css" rel="Stylesheet" />
+<script type="text/javascript" src="jqueryui/1.11.2-start/jquery-ui.min.js"></script><!-- DataTables -->
+<link type="text/css" href="datatables/1.13.1/datatables.min.css" rel="stylesheet" />
+<script type="text/javascript" src="datatables/1.13.1/datatables.min.js"></script>
+<script type="text/javascript" src="datatables/1.13.1/time-elapsed-dhms.js"></script>
+
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<script src="bootstrap/js/bootstrap.min.js"></script>
+
+
+<script>
+    jQuery.fn.dataTable.ext.type.order['time-elapsed-dhms-pre'] = function(data) {
+
+        var matches = data.match(/^(\d+(?:\.\d+)?)\s*([a-z]+)/i);
+        var multipliers = {
+            ms: 1,
+            s: 1000,
+            m: 60000,
+            h: 3600000,
+            d: 86400000
+        };
+
+        if (matches) {
+            var multiplier = multipliers[matches[2].toLowerCase()];
+            return parseFloat(matches[1]) * multiplier;
+        } else {
+            return -1;
+        };
+    };
+</script>
+<!-- ImgPreview -->
+<script src="scripts/imgpreview.full.jquery.js" type="text/javascript"></script>
+</head>
+
+<body class="results-page">
+
+
+<div id="topheader">
+    <div id="topbanner">
+        <div id="logo"><a href="index.html"><img src="images/serenity-logo.png" border="0"/></a></div>
+        <div id="projectname-banner" style="float:right">
+            <span class="projectname">
+                <span class="projecttitle">Serenity BDD Report</span>
+                <span class="projectsubtitle"></span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="middlecontent">
+    <div id="contenttop">
+        <div class="middlebg">
+        <span class="breadcrumbs">
+            <a href="index.html" class="breadcrumbs">Home</a>
+
+ <!-- inflection.of(breadcrumb.displayName).asATitle()-->
+            > <a href="5b0b500db2dfd98ccb3584eed6275bc7ba4d506665983d1b8fc2e8acb36c8678.html">
+            Api
+        </a>
+ <!-- inflection.of(breadcrumb.displayName).asATitle()-->
+            > <a href="babe0b0b0a83aa3d011073df3360d5891c080adb342ebe57eb7a573801e60d4f.html">
+            Categories User API Tests (TC-086 to TC-090)
+        </a>
+        >
+            TC-087 user API main categories
+        </span>
+        </div>
+        <div class="rightbg"></div>
+    </div>
+
+    <div class="clr"></div>
+
+    <!--/* starts second table*/-->
+<div>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#"><i class="bi bi-journal-check"></i> Overall Test Results</a>
+        </li>
+        <li >
+            <a href="capabilities.html"><i class="bi bi-journal-text"></i> Requirements</a>
+        </li>
+        <li >
+            <a href="7ea0a5e2d679b9deeda9910ae4a9bcd3a281e0d908303a9e16e486103e98880c.html"><i class="bi bi-chat-text"></i> Capabilities</a>
+        </li>
+        <li >
+            <a href="576946480b52ad056d6f5bddf874399c83582ecf90963cc074a14c70580e7d9f.html"><i class="bi bi-chat-text"></i> Features</a>
+        </li>
+    </ul>
+    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 07-02-2026 17:28</span>
+    <br style="clear:left"/>
+</div>
+    <div class="clr"></div>
+
+
+    <div id="contentbody">
+        <div class="titlebar">
+            <div class="story-title">
+                <table class="outcome-header">
+                    <tr>
+                        <td>
+                                <div>
+                                    <h3 class="discreet-story-header">
+                                        <i class="fs-2 bi bi-chat-left-quote title-icon"></i>
+                                        <span class="story-header-title">Categories User API Tests (TC-086 To TC-090) </span>
+                                    </h3>
+
+                                </div>
+
+                        </td>
+                        <td valign="top">
+                            <p class="tag">
+                                    <span class="badge example-tag tag-badge" style="background:default;">
+                                    <i class="bi bi-tag-fill"></i>&nbsp;
+                                        <a class="tagLink" style="background:default;"
+                                           href="af90b05195cfaf0a0afd8a23ab54bb69a93f0c05f8456de3000b3c2c9817f4fb.html">TC-087
+                                        </a>
+                                </span>
+                                    <span class="badge example-tag tag-badge" style="background:default;">
+                                    <i class="bi bi-tag-fill"></i>&nbsp;
+                                        <a class="tagLink" style="background:default;"
+                                           href="2a5b6a7be0f08df02d8ab0b4d4c68648c2695c6c7ef0658c71de4d42b1415b18.html">Under 1 Second
+                                              (Duration)
+                                        </a>
+                                </span>
+                                    <span class="badge example-tag tag-badge" style="background:default;">
+                                    <i class="bi bi-tag-fill"></i>&nbsp;
+                                        <a class="tagLink" style="background:default;"
+                                           href="2e8f1269fe45189870d5526ad4ad731be44b38828d72bce8e524d95df0079f07.html">User
+                                        </a>
+                                </span>
+                                    <span class="badge example-tag tag-badge" style="background:default;">
+                                    <i class="bi bi-tag-fill"></i>&nbsp;
+                                        <a class="tagLink" style="background:default;"
+                                           href="9665cbc4c123990cbe5398eeae6535a12dd1ac0f7ee01c6753086fe4f94f3d5d.html">215114F
+                                        </a>
+                                </span>
+                                    <span class="badge example-tag tag-badge" style="background:default;">
+                                    <i class="bi bi-tag-fill"></i>&nbsp;
+                                        <a class="tagLink" style="background:default;"
+                                           href="4a1ce67c03b76c66d6d5e9b5fafe3b8ad6156be2aa15c4bb4d7f603c77bcc4e2.html">Categories
+                                        </a>
+                                </span>
+                                    <span class="badge example-tag tag-badge" style="background:default;">
+                                    <i class="bi bi-tag-fill"></i>&nbsp;
+                                        <a class="tagLink" style="background:default;"
+                                           href="03c38abc150ec1d5070f58913415ff083b86c70994705a423d87e59bdc0f9a7e.html">Api
+                                        </a>
+                                </span>
+                                    
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="story-title">
+                <table class="outcome-header">
+                    <tr>
+                        <td colspan="2" class="test-title-bar">
+                            <span class="outcome-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon fa-2x' title='SUCCESS'></i></a></span>
+                            <span class="test-case-title">
+                                <span class="success-color">
+                                    TC-087 User API Main categories
+                                        <span class="related-issue-title">(TC-087)</span>
+                                </span>
+                            </span>
+
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+
+
+</div>
+</div>
+
+<div class="clr"></div>
+
+
+<div id="beforetable"></div>
+
+
+<div id="tablecontents">
+    <div>
+        <table class="step-table">
+            <tr class="step-titles">
+                <th width="65">
+                </th>
+                <th class="step-description-column greentext">
+                    Steps
+                </th>
+
+                <th width="130" class="greentext">Outcome</th>
+                <th width="100" class="greentext"><i title="Duration" class="bi bi-stopwatch"></i></th>
+            </tr>
+            <tr class="step-table-separator">
+                <td colspan="5"></td>
+            </tr>
+
+                <tr class="test-SUCCESS">
+
+                    <td width="50" class="step-icon">
+                        <a name="0"></a>
+                            <a href="javaScript:void(0)" onClick="toggleDiv('stepSection0')"
+                               style="display:block">
+                                <i class="bi bi-caret-right-square imgstepSection0 success-icon"
+                                   style="margin-left: 20px; float:left; padding-right:5px"></i>
+                            </a>
+                    </td>
+
+                    <td class="step-description-column">
+                        <div class="step-description">
+                            <a href="javaScript:void(0)" onClick="toggleDiv('stepSection0')"
+                               style="display:block;">
+                                <span class="top-level-step">
+                                                Given user logs in via API
+                                        </span>
+                            </a>
+                            <span class="evidence">
+                                </span>
+                        </div>
+                    </td>
+
+                    <td width="130"><span class="top-level-step">SUCCESS</span></td>
+                    <td width="100"><span class="top-level-step">064ms</span></td>
+                </tr>
+                    <tr>
+                        <td colspan="5">
+                            <table id="stepSection0" class="step-table-nested" style="display:none;">
+                <tr class="test-SUCCESS">
+
+                    <td width="70" class="step-icon">
+                        <a name="0-0"></a>
+                            <span style="margin-left: 40px;"
+                                  class="nested-group-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon ' title='SUCCESS'></i></a>
+                                </span>
+                    </td>
+
+                    <td class="step-description-column">
+                        <div class="step-description">
+                                <span class="nested-group-step">
+                                                POST http://localhost:8080/api/auth/login
+                                        </span>
+                            <span class="evidence">
+                                        <span class="piece-of-evidence">
+                <span>
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="collapse"
+                                data-target="#restModal-REST-2">
+                            REST Query
+                        </button>
+                    </span>
+                <!-- Modal -->
+                <div class="rest-query-details">
+                    <div class="collapse multi-collapse" id="restModal-REST-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Response</h4>
+                                    <p>URL: http://localhost:8080/api/auth/login</p>
+                                    <p>Status code: 200</p>
+                                    <p>Content Type: application/json</p>
+                                    <h4>Request Headers</h4>
+                                    <pre>Accept=*/*<br>Content-Type=application/json</pre>
+                                    <h4>Content Body</h4>
+                                    <pre>{<br>    &quot;username&quot;: &quot;testuser&quot;,<br>    &quot;password&quot;: &quot;test123&quot;<br>}</pre>
+                                    <h4>Response Headers</h4>
+                                    <pre>Set-Cookie: JSESSIONID=D1FCC2CF1BF96EFE8E0D50FCEE3B28D9; Path=/; HttpOnly<br>X-Content-Type-Options: nosniff<br>X-XSS-Protection: 0<br>Cache-Control: no-cache, no-store, max-age=0, must-revalidate<br>Pragma: no-cache<br>Expires: 0<br>X-Frame-Options: DENY<br>Content-Type: application/json<br>Content-Length: 197<br>Date: Sat, 07 Feb 2026 11:58:58 GMT<br>Keep-Alive: timeout=60<br>Connection: keep-alive</pre>
+                                <h4>Response Body</h4>
+                                    <pre>{<br>    &quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE3NzA0NjU1MzgsImV4cCI6MTc3MDQ2OTEzOH0.wfgDTEw2FOz1HLLC_rnzS1KAKYXq5y0ygV2tWhs6AQY&quot;,<br>    &quot;tokenType&quot;: &quot;Bearer&quot;<br>}</pre>
+                                    <h4>Response Cookies</h4>
+                                    <pre>JSESSIONID=D1FCC2CF1BF96EFE8E0D50FCEE3B28D9;Path=/;HttpOnly</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                        </span>
+                                </span>
+                        </div>
+                    </td>
+
+                    <td width="130"><span class="nested-group-step">SUCCESS</span></td>
+                    <td width="100"><span class="nested-group-step"></span></td>
+                </tr>
+
+                            </table>
+                        </td>
+                    </tr>
+                <tr class="test-SUCCESS">
+
+                    <td width="50" class="step-icon">
+                        <a name="1"></a>
+                            <a href="javaScript:void(0)" onClick="toggleDiv('stepSection1')"
+                               style="display:block">
+                                <i class="bi bi-caret-right-square imgstepSection1 success-icon"
+                                   style="margin-left: 20px; float:left; padding-right:5px"></i>
+                            </a>
+                    </td>
+
+                    <td class="step-description-column">
+                        <div class="step-description">
+                            <a href="javaScript:void(0)" onClick="toggleDiv('stepSection1')"
+                               style="display:block;">
+                                <span class="top-level-step">
+                                                When user requests GET /api/categories/main
+                                        </span>
+                            </a>
+                            <span class="evidence">
+                                </span>
+                        </div>
+                    </td>
+
+                    <td width="130"><span class="top-level-step">SUCCESS</span></td>
+                    <td width="100"><span class="top-level-step">096ms</span></td>
+                </tr>
+                    <tr>
+                        <td colspan="5">
+                            <table id="stepSection1" class="step-table-nested" style="display:none;">
+                <tr class="test-SUCCESS">
+
+                    <td width="70" class="step-icon">
+                        <a name="1-0"></a>
+                            <span style="margin-left: 40px;"
+                                  class="nested-group-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon ' title='SUCCESS'></i></a>
+                                </span>
+                    </td>
+
+                    <td class="step-description-column">
+                        <div class="step-description">
+                                <span class="nested-group-step">
+                                                POST http://localhost:8080/api/auth/login
+                                        </span>
+                            <span class="evidence">
+                                        <span class="piece-of-evidence">
+                <span>
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="collapse"
+                                data-target="#restModal-REST-4">
+                            REST Query
+                        </button>
+                    </span>
+                <!-- Modal -->
+                <div class="rest-query-details">
+                    <div class="collapse multi-collapse" id="restModal-REST-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Response</h4>
+                                    <p>URL: http://localhost:8080/api/auth/login</p>
+                                    <p>Status code: 200</p>
+                                    <p>Content Type: application/json</p>
+                                    <h4>Request Headers</h4>
+                                    <pre>Accept=*/*<br>Content-Type=application/json</pre>
+                                    <h4>Content Body</h4>
+                                    <pre>{<br>    &quot;username&quot;: &quot;testuser&quot;,<br>    &quot;password&quot;: &quot;test123&quot;<br>}</pre>
+                                    <h4>Response Headers</h4>
+                                    <pre>Set-Cookie: JSESSIONID=644F4A9D06A2A9DBE1042600CCC2F977; Path=/; HttpOnly<br>X-Content-Type-Options: nosniff<br>X-XSS-Protection: 0<br>Cache-Control: no-cache, no-store, max-age=0, must-revalidate<br>Pragma: no-cache<br>Expires: 0<br>X-Frame-Options: DENY<br>Content-Type: application/json<br>Content-Length: 197<br>Date: Sat, 07 Feb 2026 11:58:58 GMT<br>Keep-Alive: timeout=60<br>Connection: keep-alive</pre>
+                                <h4>Response Body</h4>
+                                    <pre>{<br>    &quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE3NzA0NjU1MzgsImV4cCI6MTc3MDQ2OTEzOH0.wfgDTEw2FOz1HLLC_rnzS1KAKYXq5y0ygV2tWhs6AQY&quot;,<br>    &quot;tokenType&quot;: &quot;Bearer&quot;<br>}</pre>
+                                    <h4>Response Cookies</h4>
+                                    <pre>JSESSIONID=644F4A9D06A2A9DBE1042600CCC2F977;Path=/;HttpOnly</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                        </span>
+                                </span>
+                        </div>
+                    </td>
+
+                    <td width="130"><span class="nested-group-step">SUCCESS</span></td>
+                    <td width="100"><span class="nested-group-step"></span></td>
+                </tr>
+                <tr class="test-SUCCESS">
+
+                    <td width="70" class="step-icon">
+                        <a name="1-1"></a>
+                            <span style="margin-left: 40px;"
+                                  class="nested-group-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon ' title='SUCCESS'></i></a>
+                                </span>
+                    </td>
+
+                    <td class="step-description-column">
+                        <div class="step-description">
+                                <span class="nested-group-step">
+                                                GET http://localhost:8080/api/categories/main
+                                        </span>
+                            <span class="evidence">
+                                        <span class="piece-of-evidence">
+                <span>
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="collapse"
+                                data-target="#restModal-REST-5">
+                            REST Query
+                        </button>
+                    </span>
+                <!-- Modal -->
+                <div class="rest-query-details">
+                    <div class="collapse multi-collapse" id="restModal-REST-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Response</h4>
+                                    <p>URL: http://localhost:8080/api/categories/main</p>
+                                    <p>Status code: 200</p>
+                                    <p>Content Type: null</p>
+                                    <h4>Request Headers</h4>
+                                    <pre>Authorization=Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE3NzA0NjU1MzgsImV4cCI6MTc3MDQ2OTEzOH0.wfgDTEw2FOz1HLLC_rnzS1KAKYXq5y0ygV2tWhs6AQY<br>Accept=*/*</pre>
+                                    <h4>Response Headers</h4>
+                                    <pre>Set-Cookie: JSESSIONID=72D6F8F4A6827C54BE62BB8D36357713; Path=/; HttpOnly<br>X-Content-Type-Options: nosniff<br>X-XSS-Protection: 0<br>Cache-Control: no-cache, no-store, max-age=0, must-revalidate<br>Pragma: no-cache<br>Expires: 0<br>X-Frame-Options: DENY<br>Content-Type: application/json<br>Content-Length: 8160<br>Date: Sat, 07 Feb 2026 11:58:58 GMT<br>Keep-Alive: timeout=60<br>Connection: keep-alive</pre>
+                                <h4>Response Body</h4>
+                                    <pre>[<br>    {<br>        &quot;id&quot;: 1,<br>        &quot;name&quot;: &quot;Upd50120&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 2,<br>        &quot;name&quot;: &quot;Outdoor&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 3,<br>        &quot;name&quot;: &quot;Succulent&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 4,<br>        &quot;name&quot;: &quot;Cactus&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 5,<br>        &quot;name&quot;: &quot;Trees&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 6,<br>        &quot;name&quot;: &quot;Shrubs&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 7,<br>        &quot;name&quot;: &quot;Cat1&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 8,<br>        &quot;name&quot;: &quot;Cat2&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 9,<br>        &quot;name&quot;: &quot;Cat3&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 10,<br>        &quot;name&quot;: &quot;Cat4&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 11,<br>        &quot;name&quot;: &quot;Cat5&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 12,<br>        &quot;name&quot;: &quot;Admin1699&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 13,<br>        &quot;name&quot;: &quot;Test2085&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 15,<br>        &quot;name&quot;: &quot;Test3240&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 16,<br>        &quot;name&quot;: &quot;Admin760&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 17,<br>        &quot;name&quot;: &quot;Test1107&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 19,<br>        &quot;name&quot;: &quot;Test2139&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 20,<br>        &quot;name&quot;: &quot;Admin9753&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 21,<br>        &quot;name&quot;: &quot;Test107&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 23,<br>        &quot;name&quot;: &quot;Admin4051&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 24,<br>        &quot;name&quot;: &quot;Upd94391&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 26,<br>        &quot;name&quot;: &quot;Admin4520&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 27,<br>        &quot;name&quot;: &quot;Upd24876&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 29,<br>        &quot;name&quot;: &quot;Admin8009&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 30,<br>        &quot;name&quot;: &quot;Upd18390&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 32,<br>        &quot;name&quot;: &quot;Test9405&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 33,<br>        &quot;name&quot;: &quot;Admin2602&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 34,<br>        &quot;name&quot;: &quot;Upd22978&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 36,<br>        &quot;name&quot;: &quot;Admin7330&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 37,<br>        &quot;name&quot;: &quot;Upd77689&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 39,<br>        &quot;name&quot;: &quot;Test8682&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 40,<br>        &quot;name&quot;: &quot;Admin9548&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 41,<br>        &quot;name&quot;: &quot;Upd49921&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 43,<br>        &quot;name&quot;: &quot;Test910&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 44,<br>        &quot;name&quot;: &quot;Admin3623&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 45,<br>        &quot;name&quot;: &quot;Upd23964&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 47,<br>        &quot;name&quot;: &quot;Test4960&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 48,<br>        &quot;name&quot;: &quot;TestMain47&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 49,<br>                &quot;name&quot;: &quot;Sub2822&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 50,<br>        &quot;name&quot;: &quot;Parent13&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 51,<br>        &quot;name&quot;: &quot;TestMain78&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 52,<br>                &quot;name&quot;: &quot;Sub9116&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 53,<br>        &quot;name&quot;: &quot;Parent559&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 54,<br>        &quot;name&quot;: &quot;TestMain88&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 55,<br>                &quot;name&quot;: &quot;Sub9174&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            },<br>            {<br>                &quot;id&quot;: 108,<br>                &quot;name&quot;: &quot;Sub7190&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 56,<br>        &quot;name&quot;: &quot;Parent583&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 57,<br>        &quot;name&quot;: &quot;TestMain52&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 58,<br>                &quot;name&quot;: &quot;Sub6833&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 59,<br>        &quot;name&quot;: &quot;Parent95&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 60,<br>        &quot;name&quot;: &quot;TestMain12&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 61,<br>                &quot;name&quot;: &quot;Sub3427&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            },<br>            {<br>                &quot;id&quot;: 75,<br>                &quot;name&quot;: &quot;Sub5435&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            },<br>            {<br>                &quot;id&quot;: 198,<br>                &quot;name&quot;: &quot;Sub7453&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 62,<br>        &quot;name&quot;: &quot;Parent182&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 63,<br>        &quot;name&quot;: &quot;Admin2255&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 64,<br>        &quot;name&quot;: &quot;Upd2635&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 66,<br>        &quot;name&quot;: &quot;Test3675&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 67,<br>        &quot;name&quot;: &quot;Admin3968&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 68,<br>        &quot;name&quot;: &quot;Upd4338&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 70,<br>        &quot;name&quot;: &quot;Test5340&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 71,<br>        &quot;name&quot;: &quot;Admin5194&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 72,<br>        &quot;name&quot;: &quot;Upd25563&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 74,<br>        &quot;name&quot;: &quot;Test6766&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 76,<br>        &quot;name&quot;: &quot;Parent261&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 77,<br>        &quot;name&quot;: &quot;TestMain31&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 78,<br>                &quot;name&quot;: &quot;Sub4618&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 79,<br>        &quot;name&quot;: &quot;Parent254&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 80,<br>        &quot;name&quot;: &quot;Admin6786&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 81,<br>        &quot;name&quot;: &quot;Upd57234&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 83,<br>        &quot;name&quot;: &quot;Test8364&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 84,<br>        &quot;name&quot;: &quot;Admin189&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 85,<br>        &quot;name&quot;: &quot;Upd40580&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 87,<br>        &quot;name&quot;: &quot;Test1782&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 88,<br>        &quot;name&quot;: &quot;TestMain67&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 89,<br>                &quot;name&quot;: &quot;Sub8957&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 90,<br>        &quot;name&quot;: &quot;Parent20&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 91,<br>        &quot;name&quot;: &quot;Admin3826&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 92,<br>        &quot;name&quot;: &quot;Upd54191&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 94,<br>        &quot;name&quot;: &quot;Test5334&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 95,<br>        &quot;name&quot;: &quot;TestMain32&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 96,<br>                &quot;name&quot;: &quot;Sub6639&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 97,<br>        &quot;name&quot;: &quot;Parent896&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 98,<br>        &quot;name&quot;: &quot;TestMain14&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 99,<br>                &quot;name&quot;: &quot;Sub8445&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 100,<br>        &quot;name&quot;: &quot;Parent106&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 101,<br>        &quot;name&quot;: &quot;TestMain35&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 102,<br>                &quot;name&quot;: &quot;Sub8664&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 103,<br>        &quot;name&quot;: &quot;Parent7&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 104,<br>        &quot;name&quot;: &quot;Admin2431&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 105,<br>        &quot;name&quot;: &quot;Upd12725&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 107,<br>        &quot;name&quot;: &quot;Test3739&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 109,<br>        &quot;name&quot;: &quot;Parent217&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 110,<br>        &quot;name&quot;: &quot;Admin3916&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 111,<br>        &quot;name&quot;: &quot;Upd34224&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 113,<br>        &quot;name&quot;: &quot;Test5219&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 114,<br>        &quot;name&quot;: &quot;TestMain58&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 115,<br>                &quot;name&quot;: &quot;Sub8896&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 116,<br>        &quot;name&quot;: &quot;Parent875&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 117,<br>        &quot;name&quot;: &quot;Admin8409&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 118,<br>        &quot;name&quot;: &quot;Upd78703&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 120,<br>        &quot;name&quot;: &quot;Test9720&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 121,<br>        &quot;name&quot;: &quot;TestMain99&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 122,<br>                &quot;name&quot;: &quot;Sub5301&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 123,<br>        &quot;name&quot;: &quot;Parent29&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 124,<br>        &quot;name&quot;: &quot;TEST_CAT&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 125,<br>        &quot;name&quot;: &quot;AutoCat&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 126,<br>        &quot;name&quot;: &quot;Admin1770&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 127,<br>        &quot;name&quot;: &quot;Upd12091&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 129,<br>        &quot;name&quot;: &quot;Test3095&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 130,<br>        &quot;name&quot;: &quot;TestMain27&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 131,<br>                &quot;name&quot;: &quot;Sub581&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 132,<br>        &quot;name&quot;: &quot;Parent494&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 133,<br>        &quot;name&quot;: &quot;Admin7436&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 134,<br>        &quot;name&quot;: &quot;Upd77730&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 136,<br>        &quot;name&quot;: &quot;Test8718&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 137,<br>        &quot;name&quot;: &quot;TestMain15&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 138,<br>                &quot;name&quot;: &quot;Sub2472&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 139,<br>        &quot;name&quot;: &quot;Parent601&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 140,<br>        &quot;name&quot;: &quot;AC1003&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 141,<br>        &quot;name&quot;: &quot;Admin7750&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 142,<br>        &quot;name&quot;: &quot;Upd58078&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 144,<br>        &quot;name&quot;: &quot;Test9106&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 145,<br>        &quot;name&quot;: &quot;TestMain39&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 146,<br>                &quot;name&quot;: &quot;Sub2717&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 147,<br>        &quot;name&quot;: &quot;Parent732&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 148,<br>        &quot;name&quot;: &quot;AC9497&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 149,<br>        &quot;name&quot;: &quot;Admin2230&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 150,<br>        &quot;name&quot;: &quot;Upd72517&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 152,<br>        &quot;name&quot;: &quot;Test3525&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 153,<br>        &quot;name&quot;: &quot;TestMain65&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 154,<br>                &quot;name&quot;: &quot;Sub7390&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 155,<br>        &quot;name&quot;: &quot;Parent351&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 156,<br>        &quot;name&quot;: &quot;AC959&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 157,<br>        &quot;name&quot;: &quot;Admin6120&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 158,<br>        &quot;name&quot;: &quot;Upd56427&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 160,<br>        &quot;name&quot;: &quot;Test7647&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 161,<br>        &quot;name&quot;: &quot;TestMain61&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 162,<br>                &quot;name&quot;: &quot;Sub387&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 163,<br>        &quot;name&quot;: &quot;Parent179&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 164,<br>        &quot;name&quot;: &quot;AC5246&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 165,<br>        &quot;name&quot;: &quot;Admin9112&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 166,<br>        &quot;name&quot;: &quot;Upd89401&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 168,<br>        &quot;name&quot;: &quot;Test426&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 169,<br>        &quot;name&quot;: &quot;TestMain10&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 170,<br>                &quot;name&quot;: &quot;Sub2441&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 171,<br>        &quot;name&quot;: &quot;Parent164&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 172,<br>        &quot;name&quot;: &quot;AC2407&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 173,<br>        &quot;name&quot;: &quot;Admin3457&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 174,<br>        &quot;name&quot;: &quot;Upd3769&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 176,<br>        &quot;name&quot;: &quot;Test4792&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 177,<br>        &quot;name&quot;: &quot;TestMain24&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 178,<br>                &quot;name&quot;: &quot;Sub6572&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 179,<br>        &quot;name&quot;: &quot;Parent302&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 180,<br>        &quot;name&quot;: &quot;Admin4025&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 181,<br>        &quot;name&quot;: &quot;Upd84375&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 183,<br>        &quot;name&quot;: &quot;Test5418&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 184,<br>        &quot;name&quot;: &quot;TestMain22&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 185,<br>                &quot;name&quot;: &quot;Sub5548&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 186,<br>        &quot;name&quot;: &quot;Parent398&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 187,<br>        &quot;name&quot;: &quot;Admin8136&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 188,<br>        &quot;name&quot;: &quot;Upd28499&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 190,<br>        &quot;name&quot;: &quot;Test9558&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 191,<br>        &quot;name&quot;: &quot;TestMain93&quot;,<br>        &quot;subCategories&quot;: [<br>            {<br>                &quot;id&quot;: 192,<br>                &quot;name&quot;: &quot;Sub261&quot;,<br>                &quot;subCategories&quot;: [<br>                    <br>                ]<br>            }<br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 193,<br>        &quot;name&quot;: &quot;Parent265&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 194,<br>        &quot;name&quot;: &quot;Admin5691&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 195,<br>        &quot;name&quot;: &quot;Upd76055&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 197,<br>        &quot;name&quot;: &quot;Test7115&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 199,<br>        &quot;name&quot;: &quot;Parent404&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 200,<br>        &quot;name&quot;: &quot;Admin7981&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    },<br>    {<br>        &quot;id&quot;: 201,<br>        &quot;name&quot;: &quot;Upd38319&quot;,<br>        &quot;subCategories&quot;: [<br>            <br>        ]<br>    }<br>]</pre>
+                                    <h4>Response Cookies</h4>
+                                    <pre>JSESSIONID=72D6F8F4A6827C54BE62BB8D36357713;Path=/;HttpOnly</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                        </span>
+                                </span>
+                        </div>
+                    </td>
+
+                    <td width="130"><span class="nested-group-step">SUCCESS</span></td>
+                    <td width="100"><span class="nested-group-step"></span></td>
+                </tr>
+
+                            </table>
+                        </td>
+                    </tr>
+                <tr class="test-SUCCESS">
+
+                    <td width="50" class="step-icon">
+                        <a name="2"></a>
+                            <span style="margin-left: 20px;"
+                                  class="top-level-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon ' title='SUCCESS'></i></a>
+                                </span>
+                    </td>
+
+                    <td class="step-description-column">
+                        <div class="step-description">
+                                <span class="top-level-step">
+                                                Then API response status should be 200
+                                        </span>
+                            <span class="evidence">
+                                </span>
+                        </div>
+                    </td>
+
+                    <td width="130"><span class="top-level-step">SUCCESS</span></td>
+                    <td width="100"><span class="top-level-step"></span></td>
+                </tr>
+                <tr class="test-SUCCESS">
+
+                    <td width="50" class="step-icon">
+                        <a name="3"></a>
+                            <span style="margin-left: 20px;"
+                                  class="top-level-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon ' title='SUCCESS'></i></a>
+                                </span>
+                    </td>
+
+                    <td class="step-description-column">
+                        <div class="step-description">
+                                <span class="top-level-step">
+                                                And response should contain list of main categories
+                                        </span>
+                            <span class="evidence">
+                                </span>
+                        </div>
+                    </td>
+
+                    <td width="130"><span class="top-level-step">SUCCESS</span></td>
+                    <td width="100"><span class="top-level-step"></span></td>
+                </tr>
+            <tr class="test-SUCCESS">
+                    <td colspan="2"></td>
+                <td width="130"><span class="top-level-step"><em>SUCCESS</em></span></td>
+                <td width="100"><span class="top-level-step"><em>0.16s</em></span></td>
+            </tr>
+
+        </table>
+    </div>
+</div>
+
+<div id="beforefooter"></div>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <span class="version">Serenity BDD version 4.2.4</span>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function toggleDiv(divId) {
+        $("#" + divId).toggle();
+        var $icon = $(".img" + divId);
+        $icon.toggleClass("bi-caret-right-square");
+        $icon.toggleClass("bi-caret-down-square");
+    }
+</script>
+
+
+<script type="text/javascript">
+    //<![CDATA[
+
+    $(document).ready(function () {
+        $('img.screenshot').imgPreview({
+            imgCSS: {
+                width: '500px'
+            },
+            distanceFromCursor: {top: 10, left: -200}
+        });
+    });
+
+    //]]>
+</script>
+<div id="imgPreviewContainer" style="position: absolute; top: 612px; left: 355px; display: none; " class=""><img
+            src="" style="display: none; "></div>
+<div id="imgPreviewContainer2" style="position: absolute; top: 925px; left: 320px; display: none; " class="">
+    <img style="width: 200px; display: none; " src=""></div>
+<div id="imgPreviewWithStyles" style="position: absolute; top: 1272px; left: 321px; display: none; " class="">
+    <img style="height: 200px; opacity: 1; display: none; " src=""></div>
+<div id="imgPreviewWithStyles2" style="display: none; position: absolute; "><img style="height: 200px; "></div>
+<div id="imgPreviewWithStyles3" style="display: none; position: absolute; "><img style="height: 200px; "></div>
+
+</div>
+</body>
+</html>
