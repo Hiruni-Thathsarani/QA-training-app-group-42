@@ -1,3 +1,4 @@
+// AuthAPISteps.java
 package stepdefinitions.api;
 
 import io.cucumber.java.en.Given;
@@ -75,8 +76,6 @@ public class AuthAPISteps {
             """.formatted(uniqueName);
 
         status = ApiClient.postWithBearer(Urls.API_CATEGORIES, token, body);
-
-        // Normalize 201 -> 200 for older feature files expecting 200
         if (status == 201) status = 200;
     }
 
@@ -99,8 +98,8 @@ public class AuthAPISteps {
         status = SerenityRest.given()
                 .contentType("application/json")
                 .body("""
-                    { "name": "CAT_NO_TOKEN_M1", "parentId": null }
-                    """)
+                        { "name": "NoToken", "parentId": null }
+                        """)
                 .post(Urls.API_CATEGORIES)
                 .then()
                 .extract()
@@ -113,15 +112,13 @@ public class AuthAPISteps {
                 Urls.API_CATEGORIES,
                 "INVALID_TOKEN",
                 """
-                { "name": "CAT_BAD_TOKEN_M1", "parentId": null }
-                """
-        );
+                        { "name": "BadToken", "parentId": null }
+                        """);
     }
 
     @Then("api response status should be {int}")
     public void apiResponseStatusShouldBe(int expected) {
 
-        // For role-based denials, allow either 401 or 403
         if (expected == 403) {
             if (!(status == 401 || status == 403)) {
                 Assume.assumeTrue("Role not enforced; expected 401/403 but got " + status, false);
@@ -129,13 +126,11 @@ public class AuthAPISteps {
             return;
         }
 
-        // Sometimes invalid token returns 401 instead of 400 depending on implementation
         if (expected == 400) {
             Assertions.assertThat(status == 400 || status == 401).isTrue();
             return;
         }
 
-        // If endpoint/payload changed and admin create fails, skip instead of failing whole suite
         if (expected == 200 && status == 400) {
             Assume.assumeTrue("Admin create failed (400). Check payload/endpoint validation.", false);
             return;
