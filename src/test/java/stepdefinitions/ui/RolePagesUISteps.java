@@ -8,6 +8,7 @@ import pages.CategoriesPage;
 import pages.PlantsPage;
 import pages.DashboardPage;
 import utils.Urls;
+import java.util.List;
 
 public class RolePagesUISteps {
 
@@ -44,6 +45,7 @@ public class RolePagesUISteps {
 
     @When("user selects a plant category filter")
     public void userSelectsPlantCategoryFilter() {
+        plantsPage.resetToPlantsList(); // ensures no old query params
         lastPlantCategoryFilter = plantsPage.selectFirstCategoryFilterOption();
         plantsPage.applyFilterIfPresent();
     }
@@ -51,8 +53,23 @@ public class RolePagesUISteps {
     @Then("plants list should show only selected category")
     public void plantsListShouldShowOnlySelectedCategory() {
         Assertions.assertThat(plantsPage.isListVisible() || plantsPage.isAt()).isTrue();
+
         if (lastPlantCategoryFilter != null) {
-            Assertions.assertThat(plantsPage.getSelectedCategoryFilterText()).isEqualTo(lastPlantCategoryFilter);
+            // Dropdown should still show the selected category
+            Assertions.assertThat(plantsPage.getSelectedCategoryFilterText())
+                    .isEqualTo(lastPlantCategoryFilter);
+
+            // Table results should match selected category in column 2
+            List<String> categories = plantsPage.getVisibleListedPlantCategories();
+            Assertions.assertThat(categories)
+                    .as("Filtered plants table should have category values in column 2")
+                    .isNotEmpty();
+            Assertions.assertThat(categories)
+                    .as("All visible rows should match selected category filter")
+                    .allMatch(c -> c.equalsIgnoreCase(lastPlantCategoryFilter)
+                            || c.contains(lastPlantCategoryFilter)
+                            || lastPlantCategoryFilter.contains(c));
+
         }
     }
 
@@ -63,15 +80,13 @@ public class RolePagesUISteps {
         boolean deleteVisible = categoriesPage.deleteVisible();
         org.junit.Assume.assumeTrue(
                 "Category admin actions visible for user; check role permissions",
-                !(addVisible || editVisible || deleteVisible)
-        );
+                !(addVisible || editVisible || deleteVisible));
     }
 
     @Then("plants should be read only for user")
     public void plantsShouldBeReadOnlyForUser() {
         org.junit.Assume.assumeTrue(
                 "Plant admin actions visible for user; check role permissions",
-                !plantsPage.adminActionsVisible()
-        );
+                !plantsPage.adminActionsVisible());
     }
 }
