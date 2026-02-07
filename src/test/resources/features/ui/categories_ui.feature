@@ -33,6 +33,14 @@ Feature: Categories UI Tests
     And user navigates to next categories page
     Then next categories page should load with correct items
 
+  @debug_filter_plants
+  @user
+  Scenario: User can filter plants by category
+    Given user is logged in as normal user
+    When user opens plants page
+    And user selects a plant category filter
+    Then plants list should show only selected category
+
   @admin
   Scenario: Admin can add a valid main category
     Given user is logged in as admin

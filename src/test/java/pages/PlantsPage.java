@@ -25,6 +25,8 @@ public class PlantsPage extends PageObject {
     @FindBy(css = "button[type='submit'], .btn-save, .btn-primary")
     WebElement saveBtn;
 
+    private WebElement lastCategoryFilterSelect;
+
     public boolean isAt() {
         try {
             return title != null && title.isDisplayed();
@@ -175,6 +177,77 @@ public class PlantsPage extends PageObject {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String selectFirstCategoryFilterOption() {
+        WebElement selectEl = firstDisplayed(
+                "select[name*='category'], select#category, select.category, .category-filter select, select[name*='cat'], select#parent, select[name*='parent']");
+        if (selectEl == null)
+            return null;
+        lastCategoryFilterSelect = selectEl;
+        try {
+            org.openqa.selenium.support.ui.Select select = new org.openqa.selenium.support.ui.Select(selectEl);
+            List<WebElement> options = select.getOptions();
+            for (WebElement option : options) {
+                String value = option.getAttribute("value");
+                String text = option.getText();
+                if (value != null && !value.trim().isEmpty() && text != null && !text.trim().isEmpty()) {
+                    select.selectByValue(value);
+                    return option.getText();
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public String getSelectedCategoryFilterText() {
+        try {
+            if (lastCategoryFilterSelect == null)
+                return null;
+            return new org.openqa.selenium.support.ui.Select(lastCategoryFilterSelect).getFirstSelectedOption().getText();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void applyFilterIfPresent() {
+        WebElement btn = firstDisplayed(
+                "button[type='submit'], button.search, .btn-search, .btn-apply, button.apply, button.btn-primary");
+        if (btn != null) {
+            try {
+                safeClick(btn);
+                return;
+            } catch (Exception ignored) {
+            }
+        }
+        WebElement btnByText = firstDisplayedXpath(
+                "//button[contains(translate(normalize-space(.),'SEARCH','search'),'search')]");
+        if (btnByText != null) {
+            try {
+                safeClick(btnByText);
+                return;
+            } catch (Exception ignored) {
+            }
+        }
+        if (lastCategoryFilterSelect != null) {
+            try {
+                lastCategoryFilterSelect.submit();
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private WebElement firstDisplayedXpath(String xpath) {
+        try {
+            List<WebElement> elements = getDriver().findElements(By.xpath(xpath));
+            for (WebElement el : elements) {
+                if (el != null && el.isDisplayed())
+                    return el;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     public boolean waitUntilPlantVisible(String name) {

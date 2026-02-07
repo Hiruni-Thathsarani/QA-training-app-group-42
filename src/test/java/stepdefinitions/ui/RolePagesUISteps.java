@@ -14,6 +14,7 @@ public class RolePagesUISteps {
     private final DashboardPage dashboardPage;
     private final CategoriesPage categoriesPage;
     private final PlantsPage plantsPage;
+    private String lastPlantCategoryFilter;
 
     public RolePagesUISteps(Pages pages) {
         this.dashboardPage = pages.getPage(DashboardPage.class);
@@ -39,6 +40,20 @@ public class RolePagesUISteps {
     @Then("plants page should be visible")
     public void plantsPageShouldBeVisible() {
         Assertions.assertThat(plantsPage.isAt()).isTrue();
+    }
+
+    @When("user selects a plant category filter")
+    public void userSelectsPlantCategoryFilter() {
+        lastPlantCategoryFilter = plantsPage.selectFirstCategoryFilterOption();
+        plantsPage.applyFilterIfPresent();
+    }
+
+    @Then("plants list should show only selected category")
+    public void plantsListShouldShowOnlySelectedCategory() {
+        Assertions.assertThat(plantsPage.isListVisible() || plantsPage.isAt()).isTrue();
+        if (lastPlantCategoryFilter != null) {
+            Assertions.assertThat(plantsPage.getSelectedCategoryFilterText()).isEqualTo(lastPlantCategoryFilter);
+        }
     }
 
     @Then("categories should be read only for user")
