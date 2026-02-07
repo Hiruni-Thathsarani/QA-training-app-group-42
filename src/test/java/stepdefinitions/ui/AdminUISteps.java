@@ -168,6 +168,7 @@ public class AdminUISteps {
         Assertions.assertThat(salesPage.sellActionVisible()).isTrue();
     }
 
+
     @When("admin opens add category page")
     public void adminOpensAddCategoryPage() {
         categoriesPage.openUrl(Urls.UI_CATEGORIES_ADD);

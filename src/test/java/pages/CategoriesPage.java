@@ -194,6 +194,7 @@ public class CategoriesPage extends PageObject {
             }
         }
 
+
         try {
             waitForCategoriesList();
         } catch (Exception ignored) {
@@ -209,6 +210,10 @@ public class CategoriesPage extends PageObject {
         }
     }
 
+    /**
+     * Wait until a row containing the given name is visible (best-effort, avoids
+     * immediate false).
+     */
     public boolean waitUntilRowVisible(String name) {
         try {
             withTimeoutOf(Duration.ofSeconds(6)).waitForCondition()
@@ -221,6 +226,7 @@ public class CategoriesPage extends PageObject {
 
     public boolean openEditForName(String name) {
         try {
+            // Ensure list is ready before scanning rows
             waitForCategoriesList();
         } catch (Exception ignored) {
         }
@@ -289,6 +295,7 @@ public class CategoriesPage extends PageObject {
 
     public boolean deleteByName(String name) {
         try {
+            // Ensure list is ready before scanning rows
             waitForCategoriesList();
         } catch (Exception ignored) {
         }
@@ -526,6 +533,7 @@ public class CategoriesPage extends PageObject {
 
     private void confirmDeleteIfNeeded() {
 
+        // Wait for JS alert and accept
         try {
             withTimeoutOf(java.time.Duration.ofSeconds(5)).waitForCondition().until(driver -> {
                 try {
@@ -541,6 +549,7 @@ public class CategoriesPage extends PageObject {
         } catch (Exception ignored) {
         }
 
+        // fallback UI modal
         WebElement confirm = firstDisplayed(
                 "button.confirm, .btn-confirm, .modal-footer .btn-danger, .swal2-confirm");
         if (confirm != null) {
@@ -599,7 +608,12 @@ public class CategoriesPage extends PageObject {
         }
     }
 
+    /**
+     * Submit the correct search form instead of clicking a generic submit button
+     * (which might be Save).
+     */
     public void applySearch() {
+        // Prefer submitting the form that owns the search input
         if (lastSearchInput != null) {
             try {
                 WebElement form = lastSearchInput.findElement(By.xpath("./ancestor::form"));
@@ -625,6 +639,7 @@ public class CategoriesPage extends PageObject {
             }
         }
 
+        // Fallback: only click explicit search/apply buttons (NO generic submit)
         WebElement button = firstDisplayed("button.search, .btn-search, button.apply, .btn-apply");
         if (button != null) {
             try {
@@ -756,14 +771,24 @@ public class CategoriesPage extends PageObject {
         }
     }
 
+    // ===================== New internal wait helper =====================
+
+    /**
+     * Wait until we're on /ui/categories and the list has rendered at least one
+     * row/container.
+     * Prevents false negatives when actions are queried too early.
+     */
     private void waitForCategoriesList() {
         withTimeoutOf(Duration.ofSeconds(8)).waitForCondition()
                 .until(driver -> driver.getCurrentUrl().contains("/ui/categories"));
 
+        // "Rendered" check: any of these indicates list is present.
         withTimeoutOf(Duration.ofSeconds(8)).waitForCondition()
                 .until(driver -> anyDisplayed(
                         "tbody tr, .category-row, .list-group-item, .list-item, table, .category-list, .categories-list"));
     }
+
+    // ===================== Existing helpers =====================
 
     private boolean anyDisplayed(String css) {
         List<WebElement> elements = getDriver().findElements(By.cssSelector(css));

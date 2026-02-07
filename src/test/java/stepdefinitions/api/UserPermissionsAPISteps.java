@@ -25,10 +25,10 @@ public class UserPermissionsAPISteps {
     private int status;
     private Response response;
 
+    private String categoryId;
     private String plantId;
     private String saleId;
     private String subCategoryId;
-    private String categoryId;
     private String invalidPricePlantName;
     private int originalStock = -1;
     private int currentStock = -1;
@@ -459,8 +459,6 @@ public class UserPermissionsAPISteps {
                 .as("Expected deleted sale to be not found or not retrievable but got " + code)
                 .isTrue();
     }
-
-
 
     @When("the admin updates the plant details")
     public void adminUpdatesPlantDetails() {
@@ -999,5 +997,4 @@ public class UserPermissionsAPISteps {
         if (name.length() > 25) name = name.substring(0, 25);
         return name;
     }
-
 }

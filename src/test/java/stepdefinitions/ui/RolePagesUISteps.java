@@ -55,11 +55,9 @@ public class RolePagesUISteps {
         Assertions.assertThat(plantsPage.isListVisible() || plantsPage.isAt()).isTrue();
 
         if (lastPlantCategoryFilter != null) {
-            // Dropdown should still show the selected category
             Assertions.assertThat(plantsPage.getSelectedCategoryFilterText())
                     .isEqualTo(lastPlantCategoryFilter);
 
-            // Table results should match selected category in column 2
             List<String> categories = plantsPage.getVisibleListedPlantCategories();
             Assertions.assertThat(categories)
                     .as("Filtered plants table should have category values in column 2")
