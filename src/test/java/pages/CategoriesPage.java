@@ -353,4 +353,242 @@ public class CategoriesPage extends PageObject {
     public boolean deleteVisible() {
         return areDeleteButtonsVisible();
     }
+
+    public boolean isListVisible() {
+        try {
+            return !tableRows.isEmpty() || getDriver().findElements(By.cssSelector("table, tbody tr")).size() > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean listContains(String text) {
+        try {
+            String source = getDriver().getPageSource();
+            return source != null && text != null && source.contains(text);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void openAddCategory() {
+        try {
+            if (addCategoryButton != null) {
+                addCategoryButton.click();
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void setCategoryName(String name) {
+        enterCategoryName(name);
+    }
+
+    public void selectNoParentIfPossible() {
+        try {
+            List<WebElement> options = parentCategoryDropdown.findElements(By.tagName("option"));
+            for (WebElement option : options) {
+                String value = option.getAttribute("value");
+                String text = option.getText();
+                if (value == null) value = "";
+                String v = value.trim().toLowerCase();
+                String t = text == null ? "" : text.trim().toLowerCase();
+                if (v.isEmpty() || v.equals("0") || t.contains("none") || t.contains("no parent") || t.contains("main")) {
+                    parentCategoryDropdown.selectByVisibleText(option.getText());
+                    return;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void saveCategory() {
+        clickSave();
+    }
+
+    public void enterSearchTerm(String term) {
+        try {
+            if (searchInput != null) {
+                lastSearchInput = searchInput;
+                searchInput.clear();
+                searchInput.type(term);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void applySearch() {
+        try {
+            if (searchButton != null) {
+                searchButton.click();
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public boolean openEditForName(String name) {
+        try {
+            for (WebElementFacade row : tableRows) {
+                if (row.getText().contains(name)) {
+                    WebElement edit = row.findElement(By.cssSelector("a[title='Edit'], a[href*='edit'], .btn-outline-primary"));
+                    edit.click();
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    public boolean deleteByName(String name) {
+        try {
+            clickDeleteForCategory(name);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean deleteFromEditPage() {
+        try {
+            WebElement del = getDriver().findElement(By.cssSelector("a[href*='delete'], button.btn-outline-danger, button.btn-danger"));
+            del.click();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getFirstCategoryText() {
+        try {
+            if (!tableRows.isEmpty()) {
+                List<WebElement> cells = tableRows.get(0).findElements(By.cssSelector("td"));
+                if (!cells.isEmpty()) return cells.get(0).getText();
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public boolean resultsContainTerm(String term) {
+        try {
+            String source = getDriver().getPageSource();
+            return source != null && term != null && source.toLowerCase().contains(term.toLowerCase());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean hasErrorBanner() {
+        try {
+            return errorAlert != null && errorAlert.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String selectFirstParentFilterOption() {
+        try {
+            List<WebElement> options = parentFilterDropdown.findElements(By.tagName("option"));
+            for (WebElement option : options) {
+                String value = option.getAttribute("value");
+                if (value != null && !value.trim().isEmpty()) {
+                    parentFilterDropdown.selectByValue(value);
+                    lastParentSelect = parentFilterDropdown;
+                    return option.getText();
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public String getSelectedParentText() {
+        try {
+            if (lastParentSelect == null) lastParentSelect = parentFilterDropdown;
+            return new org.openqa.selenium.support.ui.Select(lastParentSelect)
+                    .getFirstSelectedOption()
+                    .getText();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+    public Integer getActivePageIndex() {
+        try {
+            WebElement active = getDriver().findElement(By.cssSelector(".pagination .active, .page-item.active, li.active"));
+            String text = active.getText().trim();
+            return Integer.parseInt(text);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public boolean nextPageEnabled() {
+        try {
+            return hasNextPageLink();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void goToNextPage() {
+        clickNextPage();
+    }
+
+    public boolean addEnabled() {
+        try {
+            return addCategoryButton != null && addCategoryButton.isEnabled();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean editEnabled() {
+        try {
+            return !editButtons.isEmpty() && editButtons.get(0).isEnabled();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean deleteEnabled() {
+        try {
+            return !deleteButtons.isEmpty() && deleteButtons.get(0).isEnabled();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String selectFirstParentOption() {
+        try {
+            List<WebElement> options = parentCategoryDropdown.findElements(By.tagName("option"));
+            for (int i = 1; i < options.size(); i++) {
+                String value = options.get(i).getAttribute("value");
+                String text = options.get(i).getText();
+                if (value != null && !value.trim().isEmpty() && text != null && !text.trim().isEmpty()) {
+                    parentCategoryDropdown.selectByValue(value);
+                    return text;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public boolean selectParentByName(String name) {
+        try {
+            List<WebElement> options = parentCategoryDropdown.findElements(By.tagName("option"));
+            for (WebElement option : options) {
+                String text = option.getText();
+                if (text != null && text.contains(name)) {
+                    parentCategoryDropdown.selectByVisibleText(option.getText());
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
 }
