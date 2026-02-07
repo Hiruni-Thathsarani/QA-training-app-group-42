@@ -18,3 +18,19 @@ Feature: Admin Sales API Tests
     And oversell response should indicate insufficient stock for admin sales api tests
     And selected plant stock should remain unchanged after oversell attempt in admin sales api tests
   # // ===== NEW CODE - ADMIN SALES API TESTS END =====
+
+  # // ===== NEW CODE - ADMIN SALES API TESTS START =====
+  Scenario: TC-058 Verify Admin can fetch sales list via API
+    Given authenticated admin token is available for admin sales api tests
+    When admin requests sales list via sales api
+    Then admin sales list api response status should be 200
+    And admin sales list response should contain sales records array
+    And admin sales list response should not contain access errors
+
+  Scenario: TC-059 Verify Admin can delete sale via API
+    Given authenticated admin token is available for admin sales api tests
+    And at least one sale exists for admin sales api delete tests
+    When admin deletes selected sale via sales api
+    Then admin sales delete api response status should allow success
+    And deleted sale should not be found via sales api
+  # // ===== NEW CODE - ADMIN SALES API TESTS END =====

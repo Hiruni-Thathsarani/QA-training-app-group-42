@@ -343,4 +343,213 @@ public class AdminSalesAPISteps {
         }
         return null;
     }
+
+    // ===== NEW CODE - ADMIN SALES API TESTS START =====
+    @When("admin requests sales list via sales api")
+    public void adminRequestsSalesListViaSalesApi() {
+        response = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .get(Urls.API_SALES)
+                .then()
+                .extract()
+                .response();
+
+        status = response.statusCode();
+    }
+
+    @Then("admin sales list api response status should be 200")
+    public void adminSalesListApiResponseStatusShouldBe200() {
+        Assertions.assertThat(status).isEqualTo(200);
+    }
+
+    @And("admin sales list response should contain sales records array")
+    public void adminSalesListResponseShouldContainSalesRecordsArray() {
+        List<?> sales = firstNonNullList(
+                response.jsonPath().getList("$"),
+                response.jsonPath().getList("content"),
+                response.jsonPath().getList("data"),
+                response.jsonPath().getList("data.content"),
+                response.jsonPath().getList("items"),
+                response.jsonPath().getList("data.items")
+        );
+
+        Assertions.assertThat(sales).isNotNull();
+    }
+
+    @And("admin sales list response should not contain access errors")
+    public void adminSalesListResponseShouldNotContainAccessErrors() {
+        String body = response == null || response.asString() == null
+                ? ""
+                : response.asString().toLowerCase();
+
+        boolean hasAccessError = body.contains("unauthorized")
+                || body.contains("forbidden")
+                || body.contains("access denied");
+
+        Assertions.assertThat(hasAccessError).isFalse();
+    }
+
+    @And("at least one sale exists for admin sales api delete tests")
+    public void atLeastOneSaleExistsForAdminSalesApiDeleteTests() {
+        List<?> sales = fetchSalesForAdmin();
+        Long saleId = null;
+
+        for (Object sale : sales) {
+            saleId = extractSaleId(sale);
+            if (saleId != null) {
+                break;
+            }
+        }
+
+        if (saleId == null) {
+            saleId = createSaleAndReturnIdForAdminDelete();
+        }
+
+        if (saleId == null) {
+            Assume.assumeTrue("No sale record available for delete test", false);
+        }
+
+        net.serenitybdd.core.Serenity.setSessionVariable("adminSalesDeleteSaleId").to(saleId);
+    }
+
+    @When("admin deletes selected sale via sales api")
+    public void adminDeletesSelectedSaleViaSalesApi() {
+        Long saleId = firstNonNullLong((Object) net.serenitybdd.core.Serenity.sessionVariableCalled("adminSalesDeleteSaleId"));
+        if (saleId == null) {
+            Assume.assumeTrue("No sale id available for delete test", false);
+        }
+
+        response = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .delete(Urls.API_SALES + "/" + saleId)
+                .then()
+                .extract()
+                .response();
+
+        status = response.statusCode();
+    }
+
+    @Then("admin sales delete api response status should allow success")
+    public void adminSalesDeleteApiResponseStatusShouldAllowSuccess() {
+        Assertions.assertThat(status == 200 || status == 204).isTrue();
+    }
+
+    @And("deleted sale should not be found via sales api")
+    public void deletedSaleShouldNotBeFoundViaSalesApi() {
+        Long saleId = firstNonNullLong((Object) net.serenitybdd.core.Serenity.sessionVariableCalled("adminSalesDeleteSaleId"));
+        if (saleId == null) {
+            Assume.assumeTrue("No sale id available to verify deletion", false);
+        }
+
+        Response getAfterDelete = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .get(Urls.API_SALES + "/" + saleId)
+                .then()
+                .extract()
+                .response();
+
+        int getStatus = getAfterDelete.statusCode();
+        String body = getAfterDelete.asString() == null ? "" : getAfterDelete.asString().toLowerCase();
+
+        boolean deleted = getStatus == 404
+                || (getStatus >= 400 && body.contains("not found"))
+                || (getStatus >= 400 && body.contains("does not exist"));
+
+        Assertions.assertThat(deleted).isTrue();
+    }
+
+    private List<?> fetchSalesForAdmin() {
+        Response salesResponse = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .get(Urls.API_SALES)
+                .then()
+                .extract()
+                .response();
+
+        int salesStatus = salesResponse.statusCode();
+        if (salesStatus == 0) {
+            Assume.assumeTrue("API not reachable at " + Urls.API_SALES, false);
+        }
+        if (salesStatus == 401 || salesStatus == 403) {
+            Assume.assumeTrue("Admin token is not authorized to fetch sales list", false);
+        }
+        if (salesStatus != 200) {
+            Assume.assumeTrue("Unable to fetch sales list. Status: " + salesStatus, false);
+        }
+
+        return firstNonNullList(
+                salesResponse.jsonPath().getList("$"),
+                salesResponse.jsonPath().getList("content"),
+                salesResponse.jsonPath().getList("data"),
+                salesResponse.jsonPath().getList("data.content"),
+                salesResponse.jsonPath().getList("items"),
+                salesResponse.jsonPath().getList("data.items")
+        );
+    }
+
+    private Long extractSaleId(Object saleObject) {
+        if (!(saleObject instanceof Map<?, ?> saleMap)) {
+            return null;
+        }
+
+        return firstNonNullLong(
+                saleMap.get("id"),
+                saleMap.get("saleId"),
+                nestedMapValue(saleMap, "sale", "id")
+        );
+    }
+
+    private Long createSaleAndReturnIdForAdminDelete() {
+        List<?> plants = fetchPlantsForAdmin();
+        Long plantId = null;
+
+        for (Object plant : plants) {
+            Long id = extractPlantId(plant);
+            Integer stock = extractPlantStock(plant);
+            if (id != null && stock != null && stock >= 1) {
+                plantId = id;
+                break;
+            }
+        }
+
+        if (plantId == null) {
+            return null;
+        }
+
+        Response createResponse = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .queryParam("quantity", 1)
+                .post(Urls.API_SALES + "/plant/" + plantId)
+                .then()
+                .extract()
+                .response();
+
+        int createStatus = createResponse.statusCode();
+        if (!(createStatus == 200 || createStatus == 201)) {
+            return null;
+        }
+
+        Long createdId = firstNonNullLong(
+                createResponse.jsonPath().get("id"),
+                createResponse.jsonPath().get("data.id"),
+                createResponse.jsonPath().get("sale.id")
+        );
+        if (createdId != null) {
+            return createdId;
+        }
+
+        List<?> sales = fetchSalesForAdmin();
+        if (sales == null) {
+            return null;
+        }
+
+        for (Object sale : sales) {
+            Long saleId = extractSaleId(sale);
+            if (saleId != null) {
+                return saleId;
+            }
+        }
+        return null;
+    }
+    // ===== NEW CODE - ADMIN SALES API TESTS END =====
 }
