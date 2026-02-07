@@ -234,4 +234,61 @@ public class SalesPage extends PageObject {
 
         return null;
     }
+
+    // ===== NEW CODE - USER SALES LIST TESTS START =====
+    public boolean createSaleActionVisible() {
+        if (anyDisplayedCss("a[href*='sales/new'], button.add-sale, .btn-add, a[href*='sell'], [data-testid*='create-sale'], [data-testid*='sell']")) {
+            return true;
+        }
+        return anyDisplayedXpath(
+                "//a[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'sell plant')]"
+                        + " | //button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'sell plant')]"
+                        + " | //a[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'create sale')]"
+                        + " | //button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'create sale')]"
+                        + " | //a[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'add sale')]"
+                        + " | //button[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'add sale')]"
+        );
+    }
+
+    public boolean hasActionColumn() {
+        if (anyDisplayedCss("th.actions, td.actions, [data-testid*='action'], [data-testid*='actions'], .col-actions")) {
+            return true;
+        }
+        return anyDisplayedXpath(
+                "//th[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'action')]"
+                        + " | //th[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'delete')]"
+                        + " | //th[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'edit')]"
+                        + " | //th[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'manage')]"
+        );
+    }
+
+    public boolean hasExpectedReadOnlyColumns() {
+        return hasColumnHeader("Plant")
+                && hasColumnHeader("Quantity")
+                && hasColumnHeader("Total Price")
+                && hasColumnHeader("Sold At")
+                && !hasActionColumn();
+    }
+
+    private boolean hasColumnHeader(String headerText) {
+        String lower = headerText.toLowerCase(Locale.ENGLISH);
+        List<WebElement> headers = getDriver().findElements(By.cssSelector("table thead th, .table thead th, .sales-list thead th"));
+        for (WebElement header : headers) {
+            try {
+                if (header == null || !header.isDisplayed()) continue;
+                String text = header.getText();
+                if (text != null && text.trim().toLowerCase(Locale.ENGLISH).contains(lower)) return true;
+            } catch (Exception ignored) {}
+        }
+        List<WebElement> anyHeaders = getDriver().findElements(By.xpath("//th"));
+        for (WebElement header : anyHeaders) {
+            try {
+                if (header == null || !header.isDisplayed()) continue;
+                String text = header.getText();
+                if (text != null && text.trim().toLowerCase(Locale.ENGLISH).contains(lower)) return true;
+            } catch (Exception ignored) {}
+        }
+        return false;
+    }
+    // ===== NEW CODE - USER SALES LIST TESTS END =====
 }

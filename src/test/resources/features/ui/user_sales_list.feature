@@ -19,4 +19,16 @@ Feature: User Sales List UI Tests
     And multiple sales records with different sold dates exist
     When user opens sales page
     Then sales list should be sorted by sold date descending
+
+  Scenario: Verify Sell Plant option is hidden for User
+    Given user is logged in as normal user
+    When user opens sales page
+    Then sell plant option should not be visible for user
+    And sales table should be read only with expected columns
+
+  Scenario: Verify Delete Sale option is hidden for User
+    Given user is logged in as normal user
+    When user opens sales page
+    Then delete sale option should not be visible for user
+    And sales page should remain fully read only
   # ===== NEW CODE - USER SALES LIST TESTS END =====

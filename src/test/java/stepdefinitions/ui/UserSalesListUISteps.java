@@ -90,4 +90,32 @@ public class UserSalesListUISteps {
         Assertions.assertThat(salesPage.soldDatesSortedDesc()).isTrue();
     }
     // ===== NEW CODE - USER SALES LIST TESTS END =====
+
+    // ===== NEW CODE - USER SALES LIST TESTS START =====
+    @Then("sell plant option should not be visible for user")
+    public void sellPlantOptionShouldNotBeVisibleForUser() {
+        Assertions.assertThat(salesPage.sellPlantVisible()).isFalse();
+        Assertions.assertThat(salesPage.createSaleActionVisible()).isFalse();
+    }
+
+    @Then("sales table should be read only with expected columns")
+    public void salesTableShouldBeReadOnlyWithExpectedColumns() {
+        Assertions.assertThat(salesPage.isListVisible()).isTrue();
+        Assertions.assertThat(salesPage.hasExpectedReadOnlyColumns()).isTrue();
+        Assertions.assertThat(salesPage.editableFieldsVisible()).isFalse();
+        Assertions.assertThat(salesPage.hasActionColumn()).isFalse();
+    }
+
+    @Then("delete sale option should not be visible for user")
+    public void deleteSaleOptionShouldNotBeVisibleForUser() {
+        Assertions.assertThat(salesPage.deleteActionVisible()).isFalse();
+        Assertions.assertThat(salesPage.hasActionColumn()).isFalse();
+    }
+
+    @Then("sales page should remain fully read only")
+    public void salesPageShouldRemainFullyReadOnly() {
+        Assertions.assertThat(salesPage.readOnlyForUser()).isTrue();
+        Assertions.assertThat(salesPage.hasUiErrorBanner()).isFalse();
+    }
+    // ===== NEW CODE - USER SALES LIST TESTS END =====
 }
