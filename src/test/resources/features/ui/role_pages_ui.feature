@@ -1,13 +1,4 @@
 Feature: Role Pages UI Tests (Extra TCs)
-
-  Scenario: User UI Categories list read-only
-    Given user is logged in as normal user
-    When user opens categories page
-    Then categories page should be visible
-    And categories should be read only for user
-
-  Scenario: User UI Plants list read-only
-    Given user is logged in as normal user
-    When user opens plants page
-    Then plants page should be visible
-    And plants should be read only for user
+# Excluded from current scope (other member scenarios):
+# - User UI Categories list read-only
+# - User UI Plants list read-only
