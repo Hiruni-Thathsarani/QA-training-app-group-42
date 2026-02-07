@@ -7,13 +7,16 @@ import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PlantsPage extends PageObject {
 
     @FindBy(css = "h1, h2, .page-title")
     WebElement title;
 
-    @FindBy(css = "a[href*='plants/add'], a[href*='plants/new'], button.add-plant, .btn-add, a.btn:contains('Add')")
+    @FindBy(css = "a[href*='plants/new'], button.add-plant, .btn-add")
     WebElement addBtn;
 
     @FindBy(css = "button.edit, a[href*='edit'], .btn-edit")
@@ -30,11 +33,8 @@ public class PlantsPage extends PageObject {
     private String lastSelectedCategoryValue;
 
     public boolean isAt() {
-        try {
-            return title != null && title.isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
+        try { return title != null && title.isDisplayed(); }
+        catch (Exception e) { return false; }
     }
 
     public boolean adminActionsVisible() {
@@ -48,12 +48,10 @@ public class PlantsPage extends PageObject {
     }
 
     public boolean isListVisible() {
-        // Table should exist even if rows are filtered to 0
-        return anyDisplayed("table") || anyDisplayed("thead") || anyDisplayed("tbody");
+        return anyDisplayed("table, .plants-list, .data-table, tbody tr, .plant-row, .list-item");
     }
 
     public void resetToPlantsList() {
-        // Removes any ?categoryId=... or ?name=... filters
         openUrl(utils.Urls.UI_PLANTS);
         try {
             waitForPlantsList();
@@ -82,8 +80,7 @@ public class PlantsPage extends PageObject {
     public void setPlantName(String name) {
         WebElement input = firstDisplayed(
                 "input[name*='name'], input#name, input[placeholder*='Name'], input[placeholder*='name']");
-        if (input == null)
-            return;
+        if (input == null) return;
         try {
             input.clear();
             typeInto(input, name);
@@ -94,8 +91,7 @@ public class PlantsPage extends PageObject {
     public void setPlantPriceIfPresent(String price) {
         WebElement input = firstDisplayed(
                 "input[name*='price'], input#price, input[placeholder*='Price'], input[placeholder*='price']");
-        if (input == null)
-            return;
+        if (input == null) return;
         try {
             input.clear();
             typeInto(input, price);
@@ -105,8 +101,7 @@ public class PlantsPage extends PageObject {
 
     public void setPlantQuantityIfPresent(String qty) {
         WebElement input = firstDisplayed("input[name*='quantity'], input[name*='stock'], input#quantity, input#stock");
-        if (input == null)
-            return;
+        if (input == null) return;
         try {
             input.clear();
             typeInto(input, qty);
@@ -117,8 +112,7 @@ public class PlantsPage extends PageObject {
     public boolean selectCategoryByName(String name) {
         WebElement selectEl = firstDisplayed(
                 "select[name*='sub'], select[name*='category'], select#categoryId, select#category, select.category, select.form-select, .category-select select");
-        if (selectEl == null)
-            return false;
+        if (selectEl == null) return false;
 
         try {
             org.openqa.selenium.support.ui.Select select = new org.openqa.selenium.support.ui.Select(selectEl);
@@ -134,9 +128,6 @@ public class PlantsPage extends PageObject {
         return false;
     }
 
-    /**
-     * Click Save and wait until we are back on the plants list and it has rendered.
-     */
     public void savePlant() {
         WebElement btn = saveBtn != null ? saveBtn : firstDisplayed("button[type='submit'], .btn-save, .btn-primary");
         if (btn != null) {
@@ -145,8 +136,6 @@ public class PlantsPage extends PageObject {
             } catch (Exception ignored) {
             }
         }
-
-        // Wait until redirected back to plants list
         try {
             waitForPlantsList();
         } catch (Exception ignored) {
@@ -162,13 +151,10 @@ public class PlantsPage extends PageObject {
         }
     }
 
-    // ----------- FILTER (USER SCENARIO) -----------
-
     public String selectFirstCategoryFilterOption() {
         WebElement selectEl = firstDisplayed(
                 "select[name='categoryId'], select#categoryId, .plants-filters select, select.form-select, select[name*='category']");
-        if (selectEl == null)
-            return null;
+        if (selectEl == null) return null;
 
         lastCategoryFilterSelect = selectEl;
 
@@ -192,14 +178,11 @@ public class PlantsPage extends PageObject {
     }
 
     public String getSelectedCategoryFilterText() {
-        if (lastSelectedCategoryText != null)
-            return lastSelectedCategoryText;
+        if (lastSelectedCategoryText != null) return lastSelectedCategoryText;
 
-        // re-find to avoid stale element
         WebElement selectEl = firstDisplayed(
                 "select[name='categoryId'], select#categoryId, .plants-filters select, select.form-select, select[name*='category']");
-        if (selectEl == null)
-            return null;
+        if (selectEl == null) return null;
 
         try {
             return new org.openqa.selenium.support.ui.Select(selectEl).getFirstSelectedOption().getText().trim();
@@ -209,7 +192,6 @@ public class PlantsPage extends PageObject {
     }
 
     public void applyFilterIfPresent() {
-        // Click the button that actually says Search (your UI has a Search button)
         WebElement searchBtn = firstDisplayedXpath(
                 "//button[normalize-space()='Search' or contains(translate(normalize-space(.),'SEARCH','search'),'search')]");
         if (searchBtn != null) {
@@ -219,13 +201,11 @@ public class PlantsPage extends PageObject {
             }
         }
 
-        // Wait for list to re-render (URL contains /ui/plants and table exists)
         try {
             waitForPlantsList();
         } catch (Exception ignored) {
         }
 
-        // Ensure category filter has been applied in query string
         if (lastSelectedCategoryValue != null && !lastSelectedCategoryValue.isBlank()) {
             try {
                 withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
@@ -239,13 +219,12 @@ public class PlantsPage extends PageObject {
         List<WebElement> headers = getDriver().findElements(By.cssSelector("table thead th"));
         for (int i = 0; i < headers.size(); i++) {
             String h = headers.get(i).getText();
-            if (h == null)
-                continue;
+            if (h == null) continue;
             String norm = h.trim().toLowerCase();
             for (String name : headerNames) {
                 String n = name.toLowerCase();
                 if (norm.equals(n) || norm.contains(n)) {
-                    return i + 1; // nth-child is 1-based
+                    return i + 1;
                 }
             }
         }
@@ -254,12 +233,10 @@ public class PlantsPage extends PageObject {
 
     public String getFirstListedPlantCategory() {
         int col = getColumnIndexByHeader("category", "sub category", "subcategory");
-        if (col == -1)
-            return null;
+        if (col == -1) return null;
 
         WebElement cell = firstDisplayed("tbody tr:first-child td:nth-child(" + col + ")");
-        if (cell == null)
-            return null;
+        if (cell == null) return null;
 
         String text = cell.getText();
         return (text == null || text.trim().isEmpty()) ? null : text.trim();
@@ -269,13 +246,11 @@ public class PlantsPage extends PageObject {
         List<String> categories = new java.util.ArrayList<>();
 
         int col = getColumnIndexByHeader("category", "sub category", "subcategory");
-        if (col == -1)
-            return categories;
+        if (col == -1) return categories;
 
         List<WebElement> cells = getDriver().findElements(By.cssSelector("tbody tr td:nth-child(" + col + ")"));
         for (WebElement cell : cells) {
-            if (cell == null)
-                continue;
+            if (cell == null) continue;
             String text = cell.getText();
             if (text != null && !text.trim().isEmpty()) {
                 categories.add(text.trim());
@@ -320,7 +295,159 @@ public class PlantsPage extends PageObject {
         }
     }
 
-    // ----------- Helpers -----------
+    public String findFirstPlantNameWithStockAtLeast(int minimumStock) {
+        int nameIndex = resolvePlantNameColumnIndex();
+        int stockIndex = resolveStockColumnIndex();
+
+        List<WebElement> rows = getVisiblePlantRows();
+        for (WebElement row : rows) {
+            String plantName = extractPlantNameFromRow(row, nameIndex);
+            Integer stock = extractStockFromRow(row, stockIndex);
+            if (plantName != null && !plantName.isBlank() && stock != null && stock >= minimumStock) {
+                return plantName;
+            }
+        }
+        return null;
+    }
+
+    public Integer getStockForPlant(String plantName) {
+        if (plantName == null || plantName.isBlank()) return null;
+
+        int nameIndex = resolvePlantNameColumnIndex();
+        int stockIndex = resolveStockColumnIndex();
+
+        List<WebElement> rows = getVisiblePlantRows();
+        for (WebElement row : rows) {
+            String rowPlantName = extractPlantNameFromRow(row, nameIndex);
+            if (namesMatch(rowPlantName, plantName)) {
+                return extractStockFromRow(row, stockIndex);
+            }
+        }
+        return null;
+    }
+
+    private List<WebElement> getVisiblePlantRows() {
+        return getDriver().findElements(By.cssSelector("tbody tr, .plant-row, .list-item"));
+    }
+
+    private int resolvePlantNameColumnIndex() {
+        return findHeaderColumnIndex("name", "plant");
+    }
+
+    private int resolveStockColumnIndex() {
+        return findHeaderColumnIndex("stock", "quantity", "qty");
+    }
+
+    private int findHeaderColumnIndex(String... keywords) {
+        List<WebElement> headers = getDriver().findElements(By.cssSelector("table thead th, .table thead th, .plants-list thead th"));
+        for (int i = 0; i < headers.size(); i++) {
+            String text = safeText(headers.get(i)).toLowerCase(Locale.ENGLISH);
+            for (String keyword : keywords) {
+                if (text.contains(keyword.toLowerCase(Locale.ENGLISH))) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private String extractPlantNameFromRow(WebElement row, int nameIndex) {
+        try {
+            List<WebElement> cells = row.findElements(By.cssSelector("td"));
+            if (nameIndex >= 0 && nameIndex < cells.size()) {
+                String fromNamedCell = safeText(cells.get(nameIndex));
+                if (!fromNamedCell.isBlank()) return fromNamedCell;
+            }
+
+            for (WebElement cell : cells) {
+                String cellText = safeText(cell);
+                if (cellText.isBlank()) continue;
+                if (!cellText.matches("^\\d+$")) {
+                    return cellText;
+                }
+            }
+
+            String rowText = safeText(row);
+            return rowText.isBlank() ? null : rowText;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Integer extractStockFromRow(WebElement row, int stockIndex) {
+        try {
+            List<WebElement> cells = row.findElements(By.cssSelector("td"));
+            if (stockIndex >= 0 && stockIndex < cells.size()) {
+                Integer stockFromNamedCell = parseStrictInteger(safeText(cells.get(stockIndex)));
+                if (stockFromNamedCell != null) return stockFromNamedCell;
+            }
+
+            for (int i = cells.size() - 1; i >= 0; i--) {
+                Integer strict = parseStrictInteger(safeText(cells.get(i)));
+                if (strict != null) return strict;
+            }
+
+            return parseLastInteger(safeText(row));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Integer parseStrictInteger(String text) {
+        if (text == null) return null;
+        String normalized = text.trim().replace(",", "");
+        if (!normalized.matches("^\\d+$")) return null;
+        try {
+            return Integer.parseInt(normalized);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Integer parseLastInteger(String text) {
+        if (text == null) return null;
+        Matcher matcher = Pattern.compile("(\\d+)").matcher(text.replace(",", ""));
+        Integer last = null;
+        while (matcher.find()) {
+            try {
+                last = Integer.parseInt(matcher.group(1));
+            } catch (Exception ignored) {}
+        }
+        return last;
+    }
+
+    private boolean anyDisplayed(String css) {
+        List<WebElement> elements = getDriver().findElements(By.cssSelector(css));
+        for (WebElement element : elements) {
+            try {
+                if (element != null && element.isDisplayed()) return true;
+            } catch (Exception ignored) {}
+        }
+        return false;
+    }
+
+    private String safeText(WebElement element) {
+        try {
+            String text = element == null ? null : element.getText();
+            return text == null ? "" : text.trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private boolean namesMatch(String left, String right) {
+        if (left == null || right == null) return false;
+        String leftNormalized = normalize(left);
+        String rightNormalized = normalize(right);
+        if (leftNormalized.isBlank() || rightNormalized.isBlank()) return false;
+        return leftNormalized.equals(rightNormalized)
+                || leftNormalized.contains(rightNormalized)
+                || rightNormalized.contains(leftNormalized);
+    }
+
+    private String normalize(String text) {
+        return text.toLowerCase(Locale.ENGLISH).replaceAll("\\s+", " ").trim();
+    }
 
     private void waitForPlantsList() {
         withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
@@ -328,18 +455,6 @@ public class PlantsPage extends PageObject {
 
         withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
                 .until(driver -> isListVisible());
-    }
-
-    private boolean anyDisplayed(String css) {
-        List<WebElement> elements = getDriver().findElements(By.cssSelector(css));
-        for (WebElement el : elements) {
-            try {
-                if (el != null && el.isDisplayed())
-                    return true;
-            } catch (Exception ignored) {
-            }
-        }
-        return false;
     }
 
     private WebElement firstDisplayed(String css) {
@@ -367,8 +482,7 @@ public class PlantsPage extends PageObject {
     }
 
     private void safeClick(WebElement el) {
-        if (el == null)
-            return;
+        if (el == null) return;
         try {
             waitFor(el).waitUntilClickable().click();
         } catch (Exception e) {
