@@ -207,4 +207,187 @@ public class UserSalesAPISteps {
         }
         return null;
     }
+
+    // ===== NEW CODE - USER SALES API TESTS START =====
+    @And("at least one plant exists for user sales api tests")
+    public void atLeastOnePlantExistsForUserSalesApiTests() {
+        Response plantsResponse = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .get(Urls.API_PLANTS)
+                .then()
+                .extract()
+                .response();
+
+        int plantsStatus = plantsResponse.statusCode();
+        if (plantsStatus == 0) {
+            Assume.assumeTrue("API not reachable at " + Urls.API_PLANTS, false);
+        }
+        if (plantsStatus == 401 || plantsStatus == 403) {
+            Assume.assumeTrue("User is not authorized to fetch plants at " + Urls.API_PLANTS, false);
+        }
+        if (plantsStatus != 200) {
+            Assume.assumeTrue("Unable to fetch plants. Status: " + plantsStatus, false);
+        }
+
+        Long plantId = firstNonNullLong(
+                plantsResponse.jsonPath().get("[0].id"),
+                plantsResponse.jsonPath().get("content[0].id"),
+                plantsResponse.jsonPath().get("data[0].id"),
+                plantsResponse.jsonPath().get("data.content[0].id"),
+                plantsResponse.jsonPath().get("items[0].id"),
+                plantsResponse.jsonPath().get("data.items[0].id")
+        );
+
+        if (plantId == null) {
+            Assume.assumeTrue("No plant data available for " + Urls.API_PLANTS, false);
+        }
+
+        net.serenitybdd.core.Serenity.setSessionVariable("userSalesApiPlantId").to(plantId);
+    }
+
+    @And("current total sales count is captured for user sales api tests")
+    public void currentTotalSalesCountIsCapturedForUserSalesApiTests() {
+        Response salesPageResponse = requestSalesPage(0, 10);
+        int salesPageStatus = salesPageResponse.statusCode();
+
+        if (salesPageStatus == 0) {
+            Assume.assumeTrue("API not reachable at " + Urls.API_SALES + "/page", false);
+        }
+        if (salesPageStatus != 200) {
+            Assume.assumeTrue("Unable to fetch sales page. Status: " + salesPageStatus, false);
+        }
+
+        Long totalSalesBefore = extractTotalSalesCount(salesPageResponse);
+        if (totalSalesBefore == null) {
+            Assume.assumeTrue("Unable to read sales total from /api/sales/page", false);
+        }
+
+        net.serenitybdd.core.Serenity.setSessionVariable("userSalesApiTotalBefore").to(totalSalesBefore);
+    }
+
+    @When("user tries to create sale for existing plant via sales api")
+    public void userTriesToCreateSaleForExistingPlantViaSalesApi() {
+        Long plantId = firstNonNullLong((Object) net.serenitybdd.core.Serenity.sessionVariableCalled("userSalesApiPlantId"));
+        if (plantId == null) {
+            Assume.assumeTrue("Plant id is not available for create-sale API test", false);
+        }
+
+        response = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .queryParam("quantity", 1)
+                .post(Urls.API_SALES + "/plant/" + plantId)
+                .then()
+                .extract()
+                .response();
+
+        status = response.statusCode();
+    }
+
+    @And("forbidden response should indicate permission denied")
+    public void forbiddenResponseShouldIndicatePermissionDenied() {
+        String responseBody = response == null || response.asString() == null
+                ? ""
+                : response.asString().toLowerCase();
+        String statusLine = response == null || response.statusLine() == null
+                ? ""
+                : response.statusLine().toLowerCase();
+
+        boolean indicatesDenied = responseBody.contains("forbidden")
+                || responseBody.contains("access denied")
+                || responseBody.contains("permission denied")
+                || responseBody.contains("not authorized")
+                || responseBody.contains("unauthorized")
+                || statusLine.contains("forbidden");
+
+        Assertions.assertThat(indicatesDenied).isTrue();
+    }
+
+    @And("total sales count should remain unchanged for user sales api tests")
+    public void totalSalesCountShouldRemainUnchangedForUserSalesApiTests() {
+        Long totalSalesBefore = firstNonNullLong((Object) net.serenitybdd.core.Serenity.sessionVariableCalled("userSalesApiTotalBefore"));
+        if (totalSalesBefore == null) {
+            Assume.assumeTrue("Sales total before create attempt was not captured", false);
+        }
+
+        Response salesPageResponseAfter = requestSalesPage(0, 10);
+        int salesPageStatusAfter = salesPageResponseAfter.statusCode();
+        if (salesPageStatusAfter == 0) {
+            Assume.assumeTrue("API not reachable at " + Urls.API_SALES + "/page", false);
+        }
+        if (salesPageStatusAfter != 200) {
+            Assume.assumeTrue("Unable to fetch sales page after create attempt. Status: " + salesPageStatusAfter, false);
+        }
+
+        Long totalSalesAfter = extractTotalSalesCount(salesPageResponseAfter);
+        Assertions.assertThat(totalSalesAfter).isEqualTo(totalSalesBefore);
+    }
+
+    @When("user tries to delete sale by existing id via sales api")
+    public void userTriesToDeleteSaleByExistingIdViaSalesApi() {
+        response = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .delete(Urls.API_SALES + "/" + requestedSaleId)
+                .then()
+                .extract()
+                .response();
+
+        status = response.statusCode();
+    }
+
+    @And("sale should still exist after forbidden delete attempt")
+    public void saleShouldStillExistAfterForbiddenDeleteAttempt() {
+        Response verifyResponse = SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .get(Urls.API_SALES + "/" + requestedSaleId)
+                .then()
+                .extract()
+                .response();
+
+        Assertions.assertThat(verifyResponse.statusCode()).isEqualTo(200);
+
+        Long returnedId = firstNonNullLong(
+                verifyResponse.jsonPath().get("id"),
+                verifyResponse.jsonPath().get("data.id"),
+                verifyResponse.jsonPath().get("result.id"),
+                verifyResponse.jsonPath().get("sale.id")
+        );
+
+        Assertions.assertThat(returnedId).isEqualTo(requestedSaleId);
+    }
+
+    private Response requestSalesPage(int page, int size) {
+        return SerenityRest.given()
+                .header("Authorization", "Bearer " + token)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .get(Urls.API_SALES + "/page")
+                .then()
+                .extract()
+                .response();
+    }
+
+    private Long extractTotalSalesCount(Response salesPageResponse) {
+        Long totalElements = firstNonNullLong(
+                salesPageResponse.jsonPath().get("totalElements"),
+                salesPageResponse.jsonPath().get("data.totalElements"),
+                salesPageResponse.jsonPath().get("result.totalElements")
+        );
+        if (totalElements != null) {
+            return totalElements;
+        }
+
+        List<?> content = firstNonNullList(
+                salesPageResponse.jsonPath().getList("content"),
+                salesPageResponse.jsonPath().getList("data.content"),
+                salesPageResponse.jsonPath().getList("result.content"),
+                salesPageResponse.jsonPath().getList("items"),
+                salesPageResponse.jsonPath().getList("data.items")
+        );
+        if (content != null) {
+            return (long) content.size();
+        }
+
+        return null;
+    }
+    // ===== NEW CODE - USER SALES API TESTS END =====
 }
