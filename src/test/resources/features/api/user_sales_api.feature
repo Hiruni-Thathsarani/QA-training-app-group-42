@@ -33,3 +33,11 @@ Feature: User Sales API Tests
     And forbidden response should indicate permission denied
     And sale should still exist after forbidden delete attempt
   # // ===== NEW CODE - USER SALES API TESTS END =====
+
+  # // ===== NEW CODE - USER SALES API TESTS START =====
+  Scenario: TC-050 Verify unauthorized request returns 401
+    When user requests all sales without authentication token via sales api
+    Then sales api response status should be 401
+    And unauthorized response should indicate missing or invalid authentication
+    And no sales data should be returned for unauthorized sales request
+  # // ===== NEW CODE - USER SALES API TESTS END =====

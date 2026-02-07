@@ -390,4 +390,79 @@ public class UserSalesAPISteps {
         return null;
     }
     // ===== NEW CODE - USER SALES API TESTS END =====
+
+    // ===== NEW CODE - USER SALES API TESTS START =====
+    @When("user requests all sales without authentication token via sales api")
+    public void userRequestsAllSalesWithoutAuthenticationTokenViaSalesApi() {
+        response = SerenityRest.given()
+                .get(Urls.API_SALES)
+                .then()
+                .extract()
+                .response();
+
+        status = response.statusCode();
+    }
+
+    @And("unauthorized response should indicate missing or invalid authentication")
+    public void unauthorizedResponseShouldIndicateMissingOrInvalidAuthentication() {
+        String responseBody = response == null || response.asString() == null
+                ? ""
+                : response.asString().toLowerCase();
+        String statusLine = response == null || response.statusLine() == null
+                ? ""
+                : response.statusLine().toLowerCase();
+
+        boolean indicatesUnauthorized = responseBody.contains("unauthorized")
+                || responseBody.contains("invalid")
+                || responseBody.contains("missing")
+                || responseBody.contains("token")
+                || responseBody.contains("authentication")
+                || statusLine.contains("unauthorized");
+
+        Assertions.assertThat(indicatesUnauthorized).isTrue();
+    }
+
+    @And("no sales data should be returned for unauthorized sales request")
+    public void noSalesDataShouldBeReturnedForUnauthorizedSalesRequest() {
+        String responseBody = response == null || response.asString() == null
+                ? ""
+                : response.asString().trim();
+
+        if (responseBody.isBlank()) {
+            Assertions.assertThat(responseBody).isBlank();
+            return;
+        }
+
+        List<?> rootList = null;
+        try {
+            rootList = response.jsonPath().getList("$");
+        } catch (Exception ignored) {}
+
+        List<?> content = null;
+        try {
+            content = firstNonNullList(
+                    response.jsonPath().getList("content"),
+                    response.jsonPath().getList("data.content"),
+                    response.jsonPath().getList("result.content"),
+                    response.jsonPath().getList("items"),
+                    response.jsonPath().getList("data.items")
+            );
+        } catch (Exception ignored) {}
+
+        Object rootId = null;
+        try {
+            rootId = firstNonNull(
+                    response.jsonPath().get("id"),
+                    response.jsonPath().get("data.id"),
+                    response.jsonPath().get("result.id")
+            );
+        } catch (Exception ignored) {}
+
+        boolean hasSalesData = (rootList != null && !rootList.isEmpty())
+                || (content != null && !content.isEmpty())
+                || rootId != null;
+
+        Assertions.assertThat(hasSalesData).isFalse();
+    }
+    // ===== NEW CODE - USER SALES API TESTS END =====
 }
