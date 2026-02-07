@@ -1,6 +1,5 @@
 Feature: Authentication UI Tests
 
-  # ---------- USER UI ----------
   Scenario: TC-001 User UI - Login success (User)
     Given user is on login page
     When user logs in as normal user
@@ -15,7 +14,6 @@ Feature: Authentication UI Tests
     Given user is logged in as normal user
     Then dashboard should be visible
 
-  # ---------- ADMIN UI ----------
   Scenario: TC-011 Admin UI - Login success (Admin)
     Given user is on login page
     When user logs in as admin

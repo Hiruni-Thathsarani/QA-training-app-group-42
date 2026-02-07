@@ -1,6 +1,5 @@
 Feature: Required API Tests (TC-006 to TC-020)
 
-  # ---------- USER API ----------
   Scenario: TC-006 User API - Get categories (200)
     Given a valid user API token
     When the user requests categories list
@@ -25,7 +24,6 @@ Feature: Required API Tests (TC-006 to TC-020)
     When request create category without token
     Then api response status should be 401
 
-  # ---------- ADMIN API ----------
   Scenario: TC-016 Admin API - Create category (201/200)
     Given a valid admin API token
     When admin creates a category via API

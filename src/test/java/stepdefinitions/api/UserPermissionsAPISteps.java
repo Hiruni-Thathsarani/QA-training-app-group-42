@@ -31,12 +31,9 @@ public class UserPermissionsAPISteps {
     private int beforeStock = -1;
     private int afterStock = -1;
 
-    // ✅ UI session cookies (for /ui/... POST fallback)
     private Map<String, String> adminUiCookies;
 
-    // =========================
-    // GIVEN TOKENS
-    // =========================
+
 
     @Given("a valid user API token")
     public void aValidUserApiToken() {
@@ -56,9 +53,7 @@ public class UserPermissionsAPISteps {
         if (status == 401 || status == 403) Assume.assumeTrue("Admin credentials invalid; update TestUsers or API auth", false);
     }
 
-    // =========================
-    // USER API (TC-006/007/008)
-    // =========================
+
 
     @When("the user requests categories list")
     public void theUserRequestsCategoriesList() {
@@ -90,15 +85,11 @@ public class UserPermissionsAPISteps {
         status = response.statusCode();
     }
 
-    // =========================
-    // ADMIN API (TC-016..TC-020)
-    // =========================
 
     @When("admin creates a category via API")
     public void adminCreatesCategoryViaApiRequired() {
         String name = "AUTO_CAT_" + System.currentTimeMillis();
 
-        // 1) Try API first
         Response apiCreate = SerenityRest.given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + ensureAdminToken())
@@ -115,7 +106,6 @@ public class UserPermissionsAPISteps {
             return;
         }
 
-        // 2) Fallback: UI POST (302 is success)
         ensureAdminUiSession();
         Response uiCreate = SerenityRest.given()
                 .cookies(adminUiCookies)
@@ -126,14 +116,12 @@ public class UserPermissionsAPISteps {
                 .then().extract().response();
 
         int uiStatus = uiCreate.statusCode();
-        // ✅ UI successful create returns 302
         if (uiStatus == 302) {
             status = 201;
             categoryId = findCategoryIdByNameUi(name);
             return;
         }
 
-        // If still not ok, mark as actual failure
         status = uiStatus;
         response = uiCreate;
     }
@@ -142,11 +130,9 @@ public class UserPermissionsAPISteps {
     public void anExistingCategoryIdIsAvailable() {
         if (categoryId != null && !categoryId.isBlank()) return;
 
-        // try API list
         categoryId = ensureAdminCategoryIdApiFirst();
         if (categoryId != null) return;
 
-        // fallback UI list parse
         ensureAdminUiSession();
         categoryId = findFirstCategoryIdUi();
         if (categoryId == null) {
@@ -158,7 +144,6 @@ public class UserPermissionsAPISteps {
     public void theAdminUpdatesTheCategoryName() {
         String newName = "UPDATED_CAT_" + System.currentTimeMillis();
 
-        // 1) Try API PUT
         Response apiUpdate = SerenityRest.given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + ensureAdminToken())
@@ -172,7 +157,6 @@ public class UserPermissionsAPISteps {
             return;
         }
 
-        // 2) Fallback: UI edit (best-effort)
         ensureAdminUiSession();
         Response uiUpdate = SerenityRest.given()
                 .cookies(adminUiCookies)
@@ -195,7 +179,6 @@ public class UserPermissionsAPISteps {
     @When("the admin deletes the category by id")
     public void theAdminDeletesTheCategoryById() {
 
-        // 1) Try API DELETE
         Response apiDel = SerenityRest.given()
                 .header("Authorization", "Bearer " + ensureAdminToken())
                 .delete(Urls.API_CATEGORIES + "/" + categoryId)
@@ -207,7 +190,6 @@ public class UserPermissionsAPISteps {
             return;
         }
 
-        // 2) Fallback: UI delete (often GET)
         ensureAdminUiSession();
         Response uiDel = SerenityRest.given()
                 .cookies(adminUiCookies)
@@ -230,7 +212,6 @@ public class UserPermissionsAPISteps {
 
         String catId = (categoryId != null) ? categoryId : ensureAdminCategoryIdApiFirst();
         if (catId == null) {
-            // fallback UI category id
             ensureAdminUiSession();
             catId = findFirstCategoryIdUi();
         }
@@ -238,7 +219,6 @@ public class UserPermissionsAPISteps {
             Assume.assumeTrue("No category id available for plant create payload", false);
         }
 
-        // 1) Try API first (common)
         Response apiCreate = SerenityRest.given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + ensureAdminToken())
@@ -254,7 +234,6 @@ public class UserPermissionsAPISteps {
             return;
         }
 
-        // 2) Fallback: UI POST (302 success)
         ensureAdminUiSession();
         Response uiCreate = SerenityRest.given()
                 .cookies(adminUiCookies)
@@ -262,14 +241,14 @@ public class UserPermissionsAPISteps {
                 .formParam("name", plantName)
                 .formParam("price", "10")
                 .formParam("quantity", "5")
-                .formParam("categoryId", catId)   // if your form uses different field, change here only
+                .formParam("categoryId", catId)
                 .post(Urls.UI_PLANTS_ADD_POST)
                 .then().extract().response();
 
         int uiStatus = uiCreate.statusCode();
         if (uiStatus == 302) {
             status = 201;
-            plantId = findPlantIdByNameApi(plantName); // try API list to resolve id
+            plantId = findPlantIdByNameApi(plantName);
             return;
         }
 
@@ -281,7 +260,6 @@ public class UserPermissionsAPISteps {
     public void existingPlantIdIsAvailableForAdmin() {
         if (plantId != null && !plantId.isBlank()) return;
 
-        // Try create via our method
         theAdminCreatesAPlantViaApi();
 
         if (plantId == null || plantId.isBlank()) {
@@ -305,7 +283,6 @@ public class UserPermissionsAPISteps {
 
         status = sell.statusCode();
 
-        // small retry for eventual update
         afterStock = getPlantQuantityApi(plantId);
         if (afterStock == beforeStock) {
             try { Thread.sleep(800); } catch (InterruptedException ignored) {}
@@ -320,9 +297,7 @@ public class UserPermissionsAPISteps {
         Assertions.assertThat(afterStock).isEqualTo(beforeStock - 1);
     }
 
-    // =========================
-    // ASSERT HELPERS (already used in your feature)
-    // =========================
+
 
     @Then("the response status should be {int}")
     public void responseStatusShouldBe(int expected) {
@@ -346,9 +321,6 @@ public class UserPermissionsAPISteps {
                 .isTrue();
     }
 
-    // =========================
-    // INTERNAL HELPERS
-    // =========================
 
     private String ensureAdminToken() {
         if (adminToken != null) return adminToken;
@@ -366,7 +338,6 @@ public class UserPermissionsAPISteps {
     private void ensureAdminUiSession() {
         if (adminUiCookies != null && !adminUiCookies.isEmpty()) return;
 
-        // UI apps usually set session cookie on POST /ui/login with form params
         Response login = SerenityRest.given()
                 .contentType("application/x-www-form-urlencoded")
                 .formParam("username", TestUsers.ADMIN_USERNAME)
@@ -376,7 +347,6 @@ public class UserPermissionsAPISteps {
 
         adminUiCookies = login.getCookies();
 
-        // If UI login not a POST (some apps), still try GET + keep cookies
         if (adminUiCookies == null || adminUiCookies.isEmpty()) {
             Response get = SerenityRest.given().get(Urls.UI_LOGIN).then().extract().response();
             adminUiCookies = get.getCookies();
@@ -392,7 +362,6 @@ public class UserPermissionsAPISteps {
 
             if (list.statusCode() != 200) return null;
 
-            // list can be "$" or "content"
             String id = extractIdFromList(list);
             return (id == null || id.isBlank()) ? null : id;
         } catch (Exception e) {
@@ -515,7 +484,7 @@ public class UserPermissionsAPISteps {
         }
     }
 
-    // ===== UI HTML parsing fallbacks (best-effort) =====
+
 
     private String findFirstCategoryIdUi() {
         try {
@@ -525,7 +494,6 @@ public class UserPermissionsAPISteps {
                     .then().extract().response();
 
             String html = list.asString();
-            // Try: first row's first <td> as id (simple)
             Pattern p = Pattern.compile("<tr[^>]*>\\s*<td[^>]*>\\s*(\\d+)\\s*</td>", Pattern.CASE_INSENSITIVE);
             Matcher m = p.matcher(html);
             if (m.find()) return m.group(1);
@@ -542,8 +510,7 @@ public class UserPermissionsAPISteps {
 
             String html = list.asString();
 
-            // Find row that contains the name, then capture the first numeric <td> (id)
-            // This is best-effort for simple HTML tables.
+
             Pattern rowP = Pattern.compile("<tr[^>]*>.*?</tr>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
             Matcher rows = rowP.matcher(html);
             while (rows.find()) {

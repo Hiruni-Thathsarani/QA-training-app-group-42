@@ -2,10 +2,8 @@ package utils;
 
 public class Urls {
 
-    // ================= BASE =================
     public static final String BASE_URL = "http://localhost:8080";
 
-    // ================= UI =================
     public static final String UI_LOGIN = BASE_URL + "/ui/login";
     public static final String UI_DASHBOARD = BASE_URL + "/ui/dashboard";
     public static final String UI_LOGOUT = BASE_URL + "/ui/logout";
@@ -21,16 +19,12 @@ public class Urls {
     public static final String UI_CATEGORIES_ADD_POST = BASE_URL + "/ui/categories/add";
     public static final String UI_PLANTS_ADD_POST = BASE_URL + "/ui/plants/add";
 
-    // ================= AUTH (Swagger) =================
     public static final String API_LOGIN = BASE_URL + "/api/auth/login";
 
-    // ================= CATEGORY =================
     public static final String API_CATEGORIES = BASE_URL + "/api/categories";
 
-    // ================= PLANTS =================
     public static final String API_PLANTS = BASE_URL + "/api/plants";
 
-    // ================= SALES =================
     public static final String API_SALES = BASE_URL + "/api/sales";
 
     private Urls() {}

@@ -194,7 +194,7 @@ public class CategoriesPage extends PageObject {
             }
         }
 
-        // ✅ Wait until we are back on the list page and rows can render
+
         try {
             waitForCategoriesList();
         } catch (Exception ignored) {

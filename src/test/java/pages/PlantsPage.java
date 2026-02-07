@@ -146,7 +146,6 @@ public class PlantsPage extends PageObject {
             }
         }
 
-        // Wait until redirected back to plants list
         try {
             waitForPlantsList();
         } catch (Exception ignored) {
@@ -162,7 +161,7 @@ public class PlantsPage extends PageObject {
         }
     }
 
-    // ----------- FILTER (USER SCENARIO) -----------
+
 
     public String selectFirstCategoryFilterOption() {
         WebElement selectEl = firstDisplayed(
@@ -219,13 +218,13 @@ public class PlantsPage extends PageObject {
             }
         }
 
-        // Wait for list to re-render (URL contains /ui/plants and table exists)
+
         try {
             waitForPlantsList();
         } catch (Exception ignored) {
         }
 
-        // Ensure category filter has been applied in query string
+
         if (lastSelectedCategoryValue != null && !lastSelectedCategoryValue.isBlank()) {
             try {
                 withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
@@ -320,7 +319,6 @@ public class PlantsPage extends PageObject {
         }
     }
 
-    // ----------- Helpers -----------
 
     private void waitForPlantsList() {
         withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
