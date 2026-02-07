@@ -620,22 +620,18 @@ public class UserPermissionsAPISteps {
 
     @When("the admin creates a plant via API")
     public void theAdminCreatesAPlantViaApi() {
-        String plantName = "AUTO_PLANT_" + System.currentTimeMillis();
+        String plantName = shortPlantName("AUTO_");
 
-        String catId = (categoryId != null) ? categoryId : ensureAdminCategoryIdApiFirst();
-        if (catId == null) {
-            ensureAdminUiSession();
-            catId = findFirstCategoryIdUi();
-        }
-        if (catId == null) {
-            Assume.assumeTrue("No category id available for plant create payload", false);
+        String subCatId = ensureAdminSubCategoryId();
+        if (subCatId == null) {
+            Assume.assumeTrue("No sub-category id available for plant create payload", false);
         }
 
         Response apiCreate = SerenityRest.given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + ensureAdminToken())
-                .body("{\"name\":\"" + plantName + "\",\"price\":10,\"quantity\":5,\"categoryId\":\"" + catId + "\"}")
-                .post(Urls.API_PLANTS)
+                .body("{\"name\":\"" + plantName + "\",\"price\":10,\"quantity\":5}")
+                .post(Urls.API_PLANTS + "/category/" + subCatId)
                 .then().extract().response();
 
         int apiStatus = apiCreate.statusCode();
@@ -645,37 +641,14 @@ public class UserPermissionsAPISteps {
             if (plantId == null) plantId = findPlantIdByNameApi(plantName);
             return;
         }
-
-        ensureAdminUiSession();
-        Response uiCreate = SerenityRest.given()
-                .cookies(adminUiCookies)
-                .contentType("application/x-www-form-urlencoded")
-                .formParam("name", plantName)
-                .formParam("price", "10")
-                .formParam("quantity", "5")
-                .formParam("categoryId", catId)
-                .post(Urls.UI_PLANTS_ADD_POST)
-                .then().extract().response();
-
-        int uiStatus = uiCreate.statusCode();
-        if (uiStatus == 302) {
-            status = 201;
-            plantId = findPlantIdByNameApi(plantName);
-            return;
-        }
-
-        status = uiStatus;
-        response = uiCreate;
     }
 
     @Given("an existing plant id is available for admin")
     public void existingPlantIdIsAvailableForAdmin() {
         if (plantId != null && !plantId.isBlank()) return;
-
-        theAdminCreatesAPlantViaApi();
-
+        plantId = createPlantAsAdmin();
         if (plantId == null || plantId.isBlank()) {
-            Assume.assumeTrue("Unable to provision/find plant id for sell test", false);
+            Assume.assumeTrue("Unable to create or fetch plant id for admin tests", false);
         }
     }
 

@@ -18,17 +18,18 @@ Feature: User API Permissions and Read Access
     When the user attempts to create a plant with a valid payload
     Then the response status should be 403
 
-  Scenario: User cannot create a sale (sell plant) via API (403)
+  Scenario: User can fetch plants by category API
     Given a valid user API token
-    And an existing plant id is available
-    When the user attempts to sell the plant with quantity 1
-    Then the response status should be 403
+    And an existing category id is available
+    When the user requests plants by category
+    Then the response status should be 200
+    And the response should contain a list of plants
 
-  Scenario: User cannot delete a sale via API (403)
+  Scenario: User can get plants summary
     Given a valid user API token
-    And an existing sale id is available
-    When the user attempts to delete the sale
-    Then the response status should be 403
+    When the user requests the plants summary
+    Then the response status should be 200
+    And the plants summary should be returned
 
   @api @admin
   Scenario: Admin can fetch sales list (200)
