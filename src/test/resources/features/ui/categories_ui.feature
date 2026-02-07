@@ -33,7 +33,6 @@ Feature: Categories UI Tests
     And user navigates to next categories page
     Then next categories page should load with correct items
 
-  @debug_filter_plants
   @user
   Scenario: User can filter plants by category
     Given user is logged in as normal user

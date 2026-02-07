@@ -140,8 +140,20 @@ public class AdminUISteps {
 
     @Then("plant should appear in list")
     public void plantShouldAppearInList() {
+        // Clear any previous filters from other scenarios
+        plantsPage.resetToPlantsList();
+        plantsPage.enterListSearchTerm(createdPlantName);
+        plantsPage.applyFilterIfPresent();
+
         Assertions.assertThat(plantsPage.isAt()).isTrue();
-        Assertions.assertThat(plantsPage.listContains(createdPlantName)).isTrue();
+
+        // Wait a bit for the list to render + plant to appear
+        boolean visible = plantsPage.waitUntilPlantVisible(createdPlantName);
+        if (!visible) {
+            String firstName = plantsPage.getFirstListedPlantName();
+            visible = createdPlantName != null && createdPlantName.equals(firstName);
+        }
+        Assertions.assertThat(visible).as("Plant should appear in list").isTrue();
     }
 
     @When("admin opens sales page")

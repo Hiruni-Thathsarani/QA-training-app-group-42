@@ -13,7 +13,7 @@ public class PlantsPage extends PageObject {
     @FindBy(css = "h1, h2, .page-title")
     WebElement title;
 
-    @FindBy(css = "a[href*='plants/add'], a[href*='plants/new'], button.add-plant, .btn-add")
+    @FindBy(css = "a[href*='plants/add'], a[href*='plants/new'], button.add-plant, .btn-add, a.btn:contains('Add')")
     WebElement addBtn;
 
     @FindBy(css = "button.edit, a[href*='edit'], .btn-edit")
@@ -26,6 +26,8 @@ public class PlantsPage extends PageObject {
     WebElement saveBtn;
 
     private WebElement lastCategoryFilterSelect;
+    private String lastSelectedCategoryText;
+    private String lastSelectedCategoryValue;
 
     public boolean isAt() {
         try {
@@ -46,8 +48,17 @@ public class PlantsPage extends PageObject {
     }
 
     public boolean isListVisible() {
-        return anyDisplayed(
-                "table, .plants-list, .plant-list, .list-group, .data-table, tbody tr, .plant-row, .list-item");
+        // Table should exist even if rows are filtered to 0
+        return anyDisplayed("table") || anyDisplayed("thead") || anyDisplayed("tbody");
+    }
+
+    public void resetToPlantsList() {
+        // Removes any ?categoryId=... or ?name=... filters
+        openUrl(utils.Urls.UI_PLANTS);
+        try {
+            waitForPlantsList();
+        } catch (Exception ignored) {
+        }
     }
 
     public void openAddPlant() {
@@ -59,7 +70,7 @@ public class PlantsPage extends PageObject {
             }
         }
         WebElement link = firstDisplayed(
-                "a[href*='plants/add'], a[href*='plants/new'], a[href*='plants/create'], .btn-add, button.add-plant");
+                "a[href*='plants/add'], a[href*='plants/new'], a[href*='plants/create'], .btn-add, button.add-plant, a.btn.btn-primary");
         if (link != null) {
             try {
                 link.click();
@@ -103,32 +114,12 @@ public class PlantsPage extends PageObject {
         }
     }
 
-    public String selectFirstSubCategory() {
-        WebElement selectEl = firstDisplayed(
-                "select[name*='sub'], select[name*='category'], select#category, select.category, select#subCategory, select#categoryId, .category-select select");
-        if (selectEl == null)
-            return null;
-        try {
-            org.openqa.selenium.support.ui.Select select = new org.openqa.selenium.support.ui.Select(selectEl);
-            List<WebElement> options = select.getOptions();
-            for (WebElement option : options) {
-                String value = option.getAttribute("value");
-                String text = option.getText();
-                if (value != null && !value.trim().isEmpty() && text != null && !text.trim().isEmpty()) {
-                    select.selectByValue(value);
-                    return option.getText();
-                }
-            }
-        } catch (Exception ignored) {
-        }
-        return null;
-    }
-
     public boolean selectCategoryByName(String name) {
         WebElement selectEl = firstDisplayed(
-                "select[name*='sub'], select[name*='category'], select#category, select.category, select#subCategory, select#categoryId, .category-select select");
+                "select[name*='sub'], select[name*='category'], select#categoryId, select#category, select.category, select.form-select, .category-select select");
         if (selectEl == null)
             return false;
+
         try {
             org.openqa.selenium.support.ui.Select select = new org.openqa.selenium.support.ui.Select(selectEl);
             for (WebElement option : select.getOptions()) {
@@ -145,25 +136,17 @@ public class PlantsPage extends PageObject {
 
     /**
      * Click Save and wait until we are back on the plants list and it has rendered.
-     * This fixes "plant should appear in list" flakiness.
      */
     public void savePlant() {
-        if (saveBtn != null) {
+        WebElement btn = saveBtn != null ? saveBtn : firstDisplayed("button[type='submit'], .btn-save, .btn-primary");
+        if (btn != null) {
             try {
-                safeClick(saveBtn);
+                safeClick(btn);
             } catch (Exception ignored) {
-            }
-        } else {
-            WebElement btn = firstDisplayed("button[type='submit'], .btn-save, .btn-primary");
-            if (btn != null) {
-                try {
-                    safeClick(btn);
-                } catch (Exception ignored) {
-                }
             }
         }
 
-        // ✅ wait until redirected to /ui/plants and list is visible
+        // Wait until redirected back to plants list
         try {
             waitForPlantsList();
         } catch (Exception ignored) {
@@ -179,12 +162,16 @@ public class PlantsPage extends PageObject {
         }
     }
 
+    // ----------- FILTER (USER SCENARIO) -----------
+
     public String selectFirstCategoryFilterOption() {
         WebElement selectEl = firstDisplayed(
-                "select[name*='category'], select#category, select.category, .category-filter select, select[name*='cat'], select#parent, select[name*='parent']");
+                "select[name='categoryId'], select#categoryId, .plants-filters select, select.form-select, select[name*='category']");
         if (selectEl == null)
             return null;
+
         lastCategoryFilterSelect = selectEl;
+
         try {
             org.openqa.selenium.support.ui.Select select = new org.openqa.selenium.support.ui.Select(selectEl);
             List<WebElement> options = select.getOptions();
@@ -193,66 +180,139 @@ public class PlantsPage extends PageObject {
                 String text = option.getText();
                 if (value != null && !value.trim().isEmpty() && text != null && !text.trim().isEmpty()) {
                     select.selectByValue(value);
-                    return option.getText();
+                    lastSelectedCategoryText = text.trim();
+                    lastSelectedCategoryValue = value.trim();
+                    return lastSelectedCategoryText;
                 }
             }
         } catch (Exception ignored) {
         }
+
         return null;
     }
 
     public String getSelectedCategoryFilterText() {
+        if (lastSelectedCategoryText != null)
+            return lastSelectedCategoryText;
+
+        // re-find to avoid stale element
+        WebElement selectEl = firstDisplayed(
+                "select[name='categoryId'], select#categoryId, .plants-filters select, select.form-select, select[name*='category']");
+        if (selectEl == null)
+            return null;
+
         try {
-            if (lastCategoryFilterSelect == null)
-                return null;
-            return new org.openqa.selenium.support.ui.Select(lastCategoryFilterSelect).getFirstSelectedOption().getText();
+            return new org.openqa.selenium.support.ui.Select(selectEl).getFirstSelectedOption().getText().trim();
         } catch (Exception e) {
             return null;
         }
     }
 
     public void applyFilterIfPresent() {
-        WebElement btn = firstDisplayed(
-                "button[type='submit'], button.search, .btn-search, .btn-apply, button.apply, button.btn-primary");
-        if (btn != null) {
+        // Click the button that actually says Search (your UI has a Search button)
+        WebElement searchBtn = firstDisplayedXpath(
+                "//button[normalize-space()='Search' or contains(translate(normalize-space(.),'SEARCH','search'),'search')]");
+        if (searchBtn != null) {
             try {
-                safeClick(btn);
-                return;
+                safeClick(searchBtn);
             } catch (Exception ignored) {
             }
         }
-        WebElement btnByText = firstDisplayedXpath(
-                "//button[contains(translate(normalize-space(.),'SEARCH','search'),'search')]");
-        if (btnByText != null) {
-            try {
-                safeClick(btnByText);
-                return;
-            } catch (Exception ignored) {
-            }
+
+        // Wait for list to re-render (URL contains /ui/plants and table exists)
+        try {
+            waitForPlantsList();
+        } catch (Exception ignored) {
         }
-        if (lastCategoryFilterSelect != null) {
+
+        // Ensure category filter has been applied in query string
+        if (lastSelectedCategoryValue != null && !lastSelectedCategoryValue.isBlank()) {
             try {
-                lastCategoryFilterSelect.submit();
+                withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
+                        .until(driver -> driver.getCurrentUrl().contains("categoryId=" + lastSelectedCategoryValue));
             } catch (Exception ignored) {
             }
         }
     }
 
-    private WebElement firstDisplayedXpath(String xpath) {
-        try {
-            List<WebElement> elements = getDriver().findElements(By.xpath(xpath));
-            for (WebElement el : elements) {
-                if (el != null && el.isDisplayed())
-                    return el;
+    private int getColumnIndexByHeader(String... headerNames) {
+        List<WebElement> headers = getDriver().findElements(By.cssSelector("table thead th"));
+        for (int i = 0; i < headers.size(); i++) {
+            String h = headers.get(i).getText();
+            if (h == null)
+                continue;
+            String norm = h.trim().toLowerCase();
+            for (String name : headerNames) {
+                String n = name.toLowerCase();
+                if (norm.equals(n) || norm.contains(n)) {
+                    return i + 1; // nth-child is 1-based
+                }
             }
+        }
+        return -1;
+    }
+
+    public String getFirstListedPlantCategory() {
+        int col = getColumnIndexByHeader("category", "sub category", "subcategory");
+        if (col == -1)
+            return null;
+
+        WebElement cell = firstDisplayed("tbody tr:first-child td:nth-child(" + col + ")");
+        if (cell == null)
+            return null;
+
+        String text = cell.getText();
+        return (text == null || text.trim().isEmpty()) ? null : text.trim();
+    }
+
+    public List<String> getVisibleListedPlantCategories() {
+        List<String> categories = new java.util.ArrayList<>();
+
+        int col = getColumnIndexByHeader("category", "sub category", "subcategory");
+        if (col == -1)
+            return categories;
+
+        List<WebElement> cells = getDriver().findElements(By.cssSelector("tbody tr td:nth-child(" + col + ")"));
+        for (WebElement cell : cells) {
+            if (cell == null)
+                continue;
+            String text = cell.getText();
+            if (text != null && !text.trim().isEmpty()) {
+                categories.add(text.trim());
+            }
+        }
+        return categories;
+    }
+
+    public void enterListSearchTerm(String term) {
+        WebElement input = firstDisplayed(
+                "input[placeholder*='Search plant'], input[placeholder*='Search'], input[name='name'], input[name*='name']");
+        if (input == null) {
+            return;
+        }
+        try {
+            input.clear();
+            typeInto(input, term);
         } catch (Exception ignored) {
         }
-        return null;
+    }
+
+    public String getFirstListedPlantName() {
+        try {
+            WebElement cell = firstDisplayed("tbody tr:first-child td:nth-child(1)");
+            if (cell == null) {
+                return null;
+            }
+            String text = cell.getText();
+            return (text == null || text.trim().isEmpty()) ? null : text.trim();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean waitUntilPlantVisible(String name) {
         try {
-            withTimeoutOf(Duration.ofSeconds(8)).waitForCondition()
+            withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
                     .until(driver -> listContains(name));
             return true;
         } catch (Exception e) {
@@ -260,13 +320,13 @@ public class PlantsPage extends PageObject {
         }
     }
 
-    // ---------------- helpers ----------------
+    // ----------- Helpers -----------
 
     private void waitForPlantsList() {
-        withTimeoutOf(Duration.ofSeconds(8)).waitForCondition()
+        withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
                 .until(driver -> driver.getCurrentUrl().contains("/ui/plants"));
 
-        withTimeoutOf(Duration.ofSeconds(8)).waitForCondition()
+        withTimeoutOf(Duration.ofSeconds(10)).waitForCondition()
                 .until(driver -> isListVisible());
     }
 
@@ -294,7 +354,21 @@ public class PlantsPage extends PageObject {
         return null;
     }
 
+    private WebElement firstDisplayedXpath(String xpath) {
+        try {
+            List<WebElement> elements = getDriver().findElements(By.xpath(xpath));
+            for (WebElement el : elements) {
+                if (el != null && el.isDisplayed())
+                    return el;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
     private void safeClick(WebElement el) {
+        if (el == null)
+            return;
         try {
             waitFor(el).waitUntilClickable().click();
         } catch (Exception e) {
