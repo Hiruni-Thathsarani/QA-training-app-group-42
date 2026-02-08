@@ -6,8 +6,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assume;
 import pages.DashboardPage;
 import pages.LoginPage;
-import utils.TestUsers;
 import utils.TestEnvironment;
+import utils.TestUsers;
 import utils.Urls;
 
 public class AuthUISteps {
@@ -56,7 +56,7 @@ public class AuthUISteps {
         assumeUiAvailable();
         loginPage.openLoginPage();
         loginPage.login(TestUsers.ADMIN_USERNAME, TestUsers.ADMIN_PASSWORD);
-        Assume.assumeTrue("Admin login failed; update TestUsers or UI auth", dashboardPage.isDashboardVisible());
+        dashboardPage.waitForDashboard();
     }
 
     @Given("user is logged in as normal user")
@@ -64,7 +64,7 @@ public class AuthUISteps {
         assumeUiAvailable();
         loginPage.openLoginPage();
         loginPage.login(TestUsers.USER_USERNAME, TestUsers.USER_PASSWORD);
-        Assume.assumeTrue("User login failed; update TestUsers or UI auth", dashboardPage.isDashboardVisible());
+        dashboardPage.waitForDashboard();
     }
 
     @When("user logs out")
